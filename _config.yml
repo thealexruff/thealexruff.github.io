@@ -9,7 +9,7 @@ collections:
     permalink: /blog/:slug
   travels:
     output: true
-    permalink: /travel/:slug
+    permalink: /projects/:slug
 
 defaults:
   -
