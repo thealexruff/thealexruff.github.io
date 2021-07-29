@@ -43,6 +43,7 @@
         margin: 5%;
         position: absolute;
         /*border-radius: 20px;*/
+        z-index: 1;
         
         
         border: solid #f5f5f5 15px;
