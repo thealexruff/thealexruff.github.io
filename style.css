@@ -22,7 +22,7 @@
         height: 100%;
         width: 100%;
         background-image: url(img/homeBGnew.png);
-        background-size: auto;
+        background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
