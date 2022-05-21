@@ -18,36 +18,36 @@
     }
 
 
-    .fullscreen {
-        height: 100%;
+    .cover {
         width: 100%;
+        height: 100%;
+        position: fixed;
+
         background-image: url(img/homeBGnew.png);
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
-    .fullscreenFG {
-        height: 100vh;
-        width: 100%;
-        background-image: url(img/homeFG.png);
-        background-size: cover;
-        background-position: center;
-        position: fixed;
-        top: 0;
+
+    .body {
+      background-color: #191919; 
+      width: 100%; 
+      height: auto; 
+      position: absolute; 
+      top: 100%;
     }
+
     .border {
+
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
         margin: 5%;
         position: absolute;
-        /*border-radius: 20px;*/
-        
-        
         border: solid #f5f5f5 15px;
     }
-   
+
     .logo {
         text-align: right;
         padding-top: 10px;
@@ -57,20 +57,9 @@
     .logo img {
         width: 200px;
     }
-    
-    .cover {
-        width: 100%;
-        height: 100%;
-        position: fixed;
-    }
 
-    .body {
-      background-color: #191919; 
-      width: 100%; 
-      height: auto; 
-      position: absolute; 
-      top: 100%;"
-    }
+
+
 
     .wrapper {
       width: 90%;
@@ -107,35 +96,6 @@
       font-weight: 700;
      }
 
-    .projects {
-/*      clear: both;
-      float: none;
-      margin: 30px auto 0 auto;
-      height: auto;
-      border: white solid 2px;
-      /*border-radius: 20px;*/
-      /*color: white; */
-      display: none;
-    }
-
-    .projects:hover {
-/*      color: black;
-      background-color: white;
-      font-weight: 700;
-      font-family: 'Open Sans', sans-serif;*/
-    }
-
-    .projects p {
-/*      width: 80%;
-      margin: auto;
-      line-height: 20px;
-      font-size: 12px;
-      letter-spacing: 2px;
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 300;
-      text-align: center;*/
-    }
-
     .pic1 {
       margin: 30px 0 30px 0;
       width: 45%;
@@ -157,9 +117,6 @@
     .email {
       width: 46%; 
       float: left;
-      /*border: #FFFFFF solid 2px;*/
-      /*padding: 5px 0 5px 0;    */
-      /*display: flex;*/
     }
 
     .phonenumber {
@@ -192,39 +149,27 @@
       font-weight: 300;
     }
 
-/*    .frameio-wrapper {
-      width: 100%; height: 415px; overflow: hidden; margin-top:30px;
-    }
-*/
-    .frameio {
-      border:none; 
-      /*position: relative; margin-top: -115px;*/
-    }
-
 /*-------Responsive-------*/
 
 /* Extra small devices (phones, 430px and down) */
 @media only screen and (max-width: 430px) {
     
+  .cover {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background-attachment: scroll;
+    }
+
     .body {
+      height: auto; 
       position: relative; 
+      top: auto;
     }
-
-    .cover {
-      position: relative;
-        top:0;
-    }
-
-  .projects {
-    background: red;
   }
-}
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 430px) {
-  .projects {
-    background: green;
-  }
 
   .wrapper {
     width: 400px;
@@ -234,9 +179,6 @@
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
-  .projects {
-    background: blue;
-  }
 
   .wrapper {
     width: 650px;
@@ -278,22 +220,14 @@
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
-          .fullscreen {
-        background-image: url(img/alex5edit.jpg);
-                /*background-position: top;*/
-
+  
+  .fullscreen {
+    background-image: url(img/alex5edit.jpg);
     }
 
-
-
-  .projects {
-    background: orange;
-  }
 } 
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
-  .projects {
-    background: pink;
-  }
+
 }
