@@ -208,7 +208,10 @@
     
     .body {
       position: relative; 
-      top: 0;
+    }
+
+    .cover {
+      position: relative;
     }
 
   .projects {
