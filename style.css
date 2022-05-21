@@ -21,7 +21,7 @@
     .fullscreen {
         height: 100%;
         width: 100%;
-        background-image: url(img/homeBG.png);
+        background-image: url(img/homeBGnew.png);
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -43,7 +43,6 @@
         margin: 5%;
         position: absolute;
         /*border-radius: 20px;*/
-        z-index: 1;
         
         
         border: solid #f5f5f5 15px;
@@ -261,6 +260,14 @@
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
+          .fullscreen {
+        background-image: url(img/alex5edit.jpg);
+                /*background-position: top;*/
+
+    }
+
+
+
   .projects {
     background: orange;
   }
