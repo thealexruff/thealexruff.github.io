@@ -34,10 +34,10 @@
     
     height: 100vh;
     /* mobile viewport bug fix */
-    min-height: -webkit-fill-available;
+/*     min-height: -webkit-fill-available; */
    
-    scroll-behavior: smooth;
-    overflow: auto;
+/*     scroll-behavior: smooth; */
+/*     overflow: auto; */
 /*     scroll-snap-type: y mandatory; */
 
 }
