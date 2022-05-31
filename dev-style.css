@@ -1,0 +1,501 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #191919;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+
+mark {
+  background-color: #d3d3d3;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+
+/* SITE LAYOUT - SCROLL SNAP */
+.container {
+    position: relative;
+    width: 100%;
+    
+    height: calc(100vh - env(safe-area-inset-bottom));
+    /* mobile viewport bug fix */
+/*     min-height: -webkit-fill-available; */
+   
+     scroll-behavior: smooth; 
+     overflow: auto; 
+     scroll-snap-type: y mandatory; 
+/*     -webkit-overflow-scrolling: touch; */
+
+}
+
+.container section {
+    width: 100%;
+    height: calc(100vh - env(safe-area-inset-bottom));
+     background-size:  cover; 
+     scroll-snap-align: start; 
+    overflow: hidden;
+}
+
+.container section:nth-child(1) {
+        background-image: url(img/1stpage-bgimg-portrait.jpg);
+        background-size: cover;
+        background-position: center;
+        background-attachment: scroll;
+}
+
+.container section:nth-child(2) {
+
+}
+
+.container section:nth-child(3) {
+    /*scroll-behavior: smooth;*/
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory; 
+    position: relative;
+}
+
+.container section:nth-child(4) {
+  height: 20px;
+  text-align: center;
+  font-size: 8px;
+    object-fit: cover;
+  object-position: center;
+}
+
+
+.container section:nth-child(3) .wrappertest div {
+  height: 100vh;
+  width: 50%;
+  background-size:  cover;
+   scroll-snap-align: start; 
+  float: left;
+}
+
+.container section:nth-child(3) div:nth-child(1) {
+  background-color: blue;
+}
+
+.container section:nth-child(3) div:nth-child(2) {
+  background-color: yellow;
+}
+
+
+
+
+/* SITE 1 -- COVER */
+
+.border {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: 5%;
+  position: absolute;
+  border: solid #f5f5f5 15px;
+}
+
+.logo {
+  text-align: right;
+  padding-top: 10px;
+  padding-right: 10px;
+}
+    
+.logo img {
+  width: 150px;
+}
+
+.jobtitles {
+  position: absolute; 
+  bottom: 0; 
+  right: 0; 
+  margin: 15px; 
+  color: white; 
+  text-align: right; 
+  font-family: 'Open Sans', sans-serif; 
+  font-weight: 700; 
+  font-size: 13px;
+}
+
+.social {
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  margin: 15px;
+}
+
+.instagram {
+  width: 15px; 
+  float: left;
+}
+
+.tiktok {
+  width: 11px; 
+  float: left; 
+  margin-left: 15px; 
+  margin-top: 2px;
+}
+
+
+
+
+/* SITE 2 -- INFO */
+
+.wrapper {
+  margin: 0 5%;
+}
+
+.hellothere{
+  height: 30px;
+  margin: 0 auto;
+  padding: 30px 0;
+  display: flex;
+}
+
+.about {
+  margin: 0 auto 20px auto;
+  height: auto;
+  border: #d3d3d3 solid 2px;
+}
+
+.about p {
+  padding: 8% 0 8% 0;
+  width: 90%;
+  margin: auto;
+  line-height:20px;
+  font-size: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  text-align: center;
+  letter-spacing: 1pt;
+  color: #d3d3d3;
+}
+
+.pic1 {
+  margin: 0 0 20px 0;
+  width: 45%;
+  border: #d3d3d3 solid 2px;
+  color: white;
+  float: left;
+  overflow: hidden;
+}
+
+.pic2 {
+  width: 45%;
+  border: #d3d3d3 solid 2px;
+  color: white;
+  float: right;
+  margin: 0 0 20px 0;
+  overflow: hidden;
+}
+
+.email {
+  width: 46%; 
+  float: left;
+}
+
+.phonenumber {
+  width: 46%;
+  float: right;  
+}
+
+.pic1 img, .pic2 img {
+  width: 100%;
+}
+
+
+
+
+/* SITE 3 -- PORTFOLIO */
+
+
+.wrappertest {
+  width: 200%;
+}
+
+.portfolio {
+  position: absolute;
+  margin-top: 20px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  height: 40px;
+  z-index: 1;
+}
+
+.video {
+  object-fit: cover;
+  object-position: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.work{
+  height: 40px;
+  padding-top: 40px;
+  margin: 40px auto;
+  display: flex;
+}
+
+.wrappertest div {
+  position: relative;
+}
+
+.wrappertest div p {
+  color: white;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  }
+
+
+
+
+/* RESPONSIVE */
+
+/* Extra Small devices */
+/*@media only screen and (max-width: 300px) {
+
+    .logo img {
+      width: 150px;
+  }
+
+    .jobtitles {
+      font-size: 12px;
+    }
+
+    .instagram {
+      width: 15px; 
+    }
+
+    .tiktok {
+      width: 11px; 
+    }
+  }*/
+
+
+@media only screen
+  and (min-width: 400px)
+  and (min-height: 320px)
+  and (orientation: landscape) {
+
+.container section:nth-child(1) {
+  background-image: url(img/1stpage-bgimg-landscape.jpg);
+}
+
+.wrapper {
+  margin: 0 20px;
+}
+
+.about {
+  width: 100% ;
+  margin: 0 0 20px 0;
+
+}
+
+  .about p {
+    width: 90%;
+    line-height:20px;
+    font-size: 10px;
+    padding: 20px 0 20px 0;
+  }
+  .email {
+  width: calc(50% - 20px); 
+  float: left;
+  margin-bottom: 40px;
+}
+
+.phonenumber {
+  width: calc(50% - 20px);
+}
+
+.pic1, .pic2 {
+  display: none;
+}
+
+}
+
+
+@media only screen
+  and (min-width: 375px)
+  and (min-height: 667px) 
+  and (orientation: landscape) {
+
+  .about p {
+    
+    width: 80%;
+    line-height:23px;
+    font-size: 12px;
+  }
+}
+
+
+/*@media only screen
+  and (min-width: 667px)
+  and (min-height: 375px)
+  and (orientation: landscape) {
+
+   .wrapper {
+  margin: 0 10px;
+}
+
+.about {
+  width: calc(50% - 20px);
+  float: none;
+  margin: 0 20px 0 0;
+
+}
+
+  .about p {
+    width: 90%;
+    line-height:15px;
+    font-size: 11px;
+  }
+  .email {
+  width: calc(50% - 100px); 
+  float: none;
+}
+
+.phonenumber {
+  width: calc(50% - 100px);
+  
+}
+
+.pic1 {
+  display: block;
+  float: right;
+} 
+
+
+}*/
+
+
+@media only screen
+  and (min-width: 1024px)
+  and (min-height: 768px) 
+  and (orientation: landscape) { 
+
+    .wrapper {
+      width: 700px;
+      margin: 0 auto;
+    }
+
+    .hellothere{
+      height: 60px;
+    }
+
+    .about {
+      margin: 0;
+      width: calc(50% - 20px) ;
+      float: left;
+            height: 420px;
+    }
+
+    .about p {
+      line-height: 26px;
+      font-size: 17px;
+      padding: 8% 0 8% 0;
+    }
+
+    .pic1 {
+      float: right;
+      height: 420px;
+    }
+
+    .email, .phonenumber {
+      margin-top: 40px;
+    }
+
+    .pic1 {
+      display: block;
+      margin-bottom: 0;
+      width: calc(50% - 20px) ;
+    }
+
+
+
+}
+
+
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/*@media only screen 
+  and (min-width: 430px) {
+
+  .wrapper {
+    width: 400px;
+    margin: 0 auto;
+  }
+
+  .logo img {
+    width: 250px;
+  }
+}*/
+
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen 
+  and (min-width: 768px) 
+  and (min-height: 940px) {
+
+.container section:nth-child(1) {
+  background-image: url(img/1stpage-bgimg-landscape.jpg);
+}
+
+.logo img {
+  width: 300px;
+}
+
+.jobtitles {
+  font-size: 20px;
+}
+
+.wrapper {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.hellothere{
+  height: 60px;
+}
+
+.about p {
+  line-height: 23px;
+  font-size: 17px;
+}
+
+
+} 
+
+@media only screen and (min-width: 800px) {
+  
+.container section:nth-child(1) {
+  background-image: url(img/1stpage-bgimg-landscape.jpg);
+}
+
+}
+
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+
+.logo img {
+  width: 350px;
+}
+
+} 
+
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+
+}
