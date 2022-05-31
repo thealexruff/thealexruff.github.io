@@ -36,9 +36,9 @@
     /* mobile viewport bug fix */
 /*     min-height: -webkit-fill-available; */
    
-/*     scroll-behavior: smooth; */
-/*     overflow: auto; */
-/*     scroll-snap-type: y mandatory; */
+    scroll-behavior: smooth;
+    overflow: auto;
+    scroll-snap-type: y mandatory;
 /*     -webkit-overflow-scrolling: touch; */
 
 }
@@ -46,8 +46,8 @@
 .container section {
     width: 100%;
     height: calc(100vh - env(safe-area-inset-bottom));
-/*     background-size:  cover; */
-/*     scroll-snap-align: start; */
+    background-size:  cover;
+    scroll-snap-align: start;
     overflow: hidden;
 }
 
@@ -65,10 +65,10 @@
 
 
 .container section:nth-child(3) {
-    /*scroll-behavior: smooth;*/
+    scroll-behavior: smooth;
     overflow-x: scroll;
     overflow-y: hidden;
-/*     scroll-snap-type: x mandatory; */
+    scroll-snap-type: x mandatory;
 }
 
 .wrappertest {
@@ -89,8 +89,8 @@
 .container section:nth-child(3) .wrappertest div {
   height: 100vh;
   width: 50%;
-  /*background-size:  cover;*/
-/*   scroll-snap-align: start; */
+  background-size:  cover;
+  scroll-snap-align: start;
   float: left;
 }
 
