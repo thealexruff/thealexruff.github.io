@@ -302,6 +302,14 @@
     }
 }  */
 
+@media only screen and (min-width: 800px) {
+  
+.container section:nth-child(1) {
+  background-image: url(img/1stpage-bgimg-landscape.jpg);
+}
+
+}
+
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
   
