@@ -262,7 +262,7 @@
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 768px) {
+/* @media only screen and (min-width: 768px) {
 
   .wrapper {
     width: 650px;
@@ -300,7 +300,7 @@
       float: left;  
       margin: 30px 0 30px 37px;
     }
-} 
+}  */
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
