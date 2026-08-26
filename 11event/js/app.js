@@ -104,43 +104,62 @@ const erreichbar = () => (zustand.dj ? 2 : 0);
    Auswahlbereich
    ------------------------------------------------------------------ */
 function wahlZeichnen() {
-  const w = $('#wahl');
   const s = SCHRITTE[zustand.schritt].id;
 
-  if (s === 'dj')      w.innerHTML = wahlDj();
-  if (s === 'licht')   w.innerHTML = wahlLicht();
-  if (s === 'anfrage') w.innerHTML = wahlAnfrage();
+  djKarteZeichnen();
+  $('#djBlock').dataset.offen = String(s === 'dj');
 
-  $('#szeneNav').hidden      = !zustand.karussell;
-  $('#wischhinweis').hidden  = !zustand.karussell;
-  $('#klang').dataset.sichtbar = String(zustand.karussell);
+  $('#wahl').innerHTML =
+    s === 'licht'   ? wahlLicht()   :
+    s === 'anfrage' ? wahlAnfrage() : '';
+
+  $('#szeneNav').hidden     = !zustand.karussell;
+  $('#wischhinweis').hidden = !zustand.karussell;
+  scrollPruefen();
 }
 
-function wahlDj() {
+/* Gescrollt wird nur, wenn der Inhalt wirklich über das Bild hinausgeht. */
+function scrollPruefen() {
+  requestAnimationFrame(() => {
+    const noetig = document.documentElement.scrollHeight > window.innerHeight + 2;
+    document.body.dataset.scroll = String(noetig);
+    if (!noetig) window.scrollTo(0, 0);
+  });
+}
+
+/* Die DJ-Karte wird befüllt, nicht ersetzt — im Aufklapper steckt der
+   Player, und der darf beim Neuzeichnen nicht verloren gehen. */
+function djKarteZeichnen() {
   const dj = DJS[zustand.djIndex];
   const gewaehlt = zustand.dj === dj.id;
-  return `
-    <div class="karte karte--dj">
-      <div class="karte__kopf">
-        <div>
-          <span class="hut">DJ · ${zustand.djIndex + 1} von ${DJS.length}</span>
-          <h1 class="karte__titel">${dj.name}</h1>
-          <p class="karte__stil">${dj.stil}</p>
-        </div>
-        <div class="preis">${euro(dj.preis)}</div>
-      </div>
-      <div class="karte__fuss">
-        <button class="knopf knopf--voll" type="button" data-dj="${dj.id}">
-          ${gewaehlt ? `Weiter mit ${dj.name}` : `${dj.name} auswählen`}
-        </button>
-      </div>
 
-      <button class="mehr" type="button" data-details="dj" aria-expanded="${zustand.details.dj}">
-        <span>Über ${dj.name}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      ${zustand.details.dj ? `<div class="mehr__inhalt"><p class="karte__text">${dj.text}</p></div>` : ''}
-    </div>`;
+  $('#djHut').textContent   = `DJ · ${zustand.djIndex + 1} von ${DJS.length}`;
+  $('#djName').textContent  = dj.name;
+  $('#djStil').textContent  = dj.stil;
+  $('#djPreis').textContent = euro(dj.preis);
+  $('#djWaehlen').textContent = gewaehlt ? `Weiter mit ${dj.name}` : `${dj.name} auswählen`;
+  $('#djWaehlen').dataset.dj  = dj.id;
+  $('#djMehrText').textContent = `Über ${dj.name}`;
+
+  $('#djFoto').innerHTML = dj.foto
+    ? `<img src="${dj.foto}" alt="${dj.name}" loading="lazy">`
+    : portraetSVG(dj);
+
+  $('#djText').textContent = dj.lang || dj.text;
+
+  /* einspaltig — zweispaltig brechen die Werte unschön um */
+  $('#djFakten').innerHTML = (dj.fakten || [])
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+
+  $('#djLinks').innerHTML = (dj.links || [])
+    .filter(l => l.url)
+    .map(l => `<li><a class="link" href="${l.url}" target="_blank" rel="noopener noreferrer">
+         ${l.titel}
+         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+       </a></li>`).join('');
+
+  $('#djInfo').dataset.offen = String(zustand.details.dj);
+  $('#djMehr').setAttribute('aria-expanded', String(zustand.details.dj));
 }
 
 function wahlLicht() {
@@ -245,8 +264,8 @@ function zuDj(i) {
   punkteZeichnen();
   wahlZeichnen();
   szeneAktualisieren();
-  /* Beim Blättern den Track mitziehen. Lief schon etwas, läuft es weiter. */
-  if (wechsel) Klang.zeigen(DJS[neu], Klang.spieltGerade());
+  /* Beim Blättern läuft der neue Mix sofort los — außer es ist stumm. */
+  if (wechsel) Klang.zeigen(DJS[neu], true);
 }
 
 /* DJ festlegen: Karussell klappt zusammen, das Rig baut sich
@@ -258,10 +277,14 @@ function waehleDj(id) {
   zustand.karussell = false;
   if (!zustand.licht) zustand.licht = LICHT[0].id;   /* S ist immer dabei */
 
+  /* Den Gewählten in die Mitte setzen und die Kamera im selben Bild
+     mitziehen — sichtbar passiert dabei nichts. Danach fährt die
+     Kamera nur noch heraus, ohne seitlichen Schwenk. */
   szene.waehleDj(i);
-  szene.baueRig(LICHT.find(l => l.id === zustand.licht));
+  szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
 
-  Klang.zeigen(DJS[i], true);                        /* jetzt läuft die Musik */
+  szene.baueRig(LICHT.find(l => l.id === zustand.licht));
+  Klang.zeigen(DJS[i], true);
 
   zustand.schritt = 1;
   zeichnen();
@@ -355,7 +378,7 @@ function anfrageSenden() {
    Ereignisse
    ------------------------------------------------------------------ */
 document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-dj],[data-licht],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],[data-details],#senden');
+  const t = e.target.closest('[data-dj],[data-licht],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],[data-details],#djMehr,#senden');
   if (!t) return;
 
   if (t.dataset.dj)            waehleDj(t.dataset.dj);
@@ -365,6 +388,7 @@ document.addEventListener('click', (e) => {
   else if (t.dataset.schritt)  schrittSetzen(+t.dataset.schritt);
   else if (t.dataset.punkt)    zuDj(+t.dataset.punkt);
   else if (t.dataset.details)  { const k = t.dataset.details; zustand.details[k] = !zustand.details[k]; wahlZeichnen(); }
+  else if (t.id === 'djMehr')  { zustand.details.dj = !zustand.details.dj; djKarteZeichnen(); scrollPruefen(); }
   else if (t.dataset.weg)      entferne(t.dataset.weg);
   else if (t.id === 'senden')  anfrageSenden();
 });
@@ -444,7 +468,11 @@ document.addEventListener('keydown', (e) => {
   svg.addEventListener('pointercancel', los);
 })();
 
-window.addEventListener('resize', () => szeneAktualisieren(true));
+window.addEventListener('resize', () => { szeneAktualisieren(true); scrollPruefen(); });
+$$('.klapp').forEach(k => k.addEventListener('transitionend', scrollPruefen));
+/* Erst wenn die Schrift steht, stimmen die Höhen. */
+window.addEventListener('load', scrollPruefen);
+if (document.fonts) document.fonts.ready.then(scrollPruefen);
 
 /* ------------------------------------------------------------------
    Start

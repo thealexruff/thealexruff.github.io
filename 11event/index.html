@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- ?v=… nach jeder Änderung hochzählen, sonst hält der Browser
      bis zu vier Stunden die alte Datei fest (Cache von GitHub Pages). -->
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=3">
 <script src="https://w.soundcloud.com/player/api.js"></script>
 </head>
 <body>
@@ -61,13 +61,52 @@
   <section class="blatt">
     <span class="blatt__griff" aria-hidden="true"></span>
 
-    <!-- Bleibt dauerhaft im Dokument, damit die Musik beim
-         Schrittwechsel nicht abreißt. Nie neu rendern. -->
-    <div class="klang" id="klang" data-sichtbar="false">
-      <iframe id="scFrame" title="Set anhören" allow="autoplay"
-              frameborder="0" scrolling="no"></iframe>
+    <!-- DJ-Schritt. Steht dauerhaft im Dokument und wird nie ersetzt,
+         nur befüllt — sonst würde der Player unten die Musik verlieren. -->
+    <div class="klapp" id="djBlock" data-offen="true">
+     <div>
+      <div class="wahl">
+        <div class="karte">
+          <div class="karte__kopf">
+            <div>
+              <span class="hut" id="djHut"></span>
+              <h1 class="karte__titel" id="djName"></h1>
+              <p class="karte__stil" id="djStil"></p>
+            </div>
+            <div class="preis" id="djPreis"></div>
+          </div>
+
+          <div class="karte__fuss">
+            <button class="knopf knopf--voll" id="djWaehlen" type="button"></button>
+          </div>
+
+          <button class="mehr" id="djMehr" type="button" aria-expanded="false" aria-controls="djInfo">
+            <span id="djMehrText">Mehr</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="klapp" id="djInfo" data-offen="false">
+           <div>
+            <div class="mehr__inhalt">
+              <div class="portraet" id="djFoto"></div>
+              <p class="karte__text" id="djText"></p>
+              <dl class="daten" id="djFakten"></dl>
+              <ul class="links" id="djLinks"></ul>
+
+              <!-- Der Player. Wird nie verschoben und nie neu erzeugt. -->
+              <div class="klang">
+                <iframe id="scFrame" title="Set anhören" allow="autoplay"
+                        frameborder="0" scrolling="no"></iframe>
+              </div>
+            </div>
+           </div>
+          </div>
+        </div>
+      </div>
+     </div>
     </div>
 
+    <!-- Licht und Anfrage -->
     <div class="wahl" id="wahl" aria-live="polite"></div>
   </section>
 
@@ -96,9 +135,9 @@
 
 <div class="korb__schleier" id="korbSchleier" hidden></div>
 
-<script src="js/data.js?v=2"></script>
-<script src="js/scene.js?v=2"></script>
-<script src="js/klang.js?v=2"></script>
-<script src="js/app.js?v=2"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/scene.js?v=3"></script>
+<script src="js/klang.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>

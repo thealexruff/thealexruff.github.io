@@ -14,13 +14,27 @@ const KONTAKT_MAIL = 'info@11event.de';
 const SET_PLATZHALTER = 'https://soundcloud.com/forss/flickermood';
 
 /* ---------- 1. DJs ----------
-   look:  haut, haar, shirt, hose, schuh, akzent
-   typ:   'kurz' | 'lang' | 'muetze'   (Kopf-Variante)
-   pose:  'hoch' | 'pult' | 'mikro'    (Arm-Variante)          */
+   look:   haut, haar, shirt, hose, schuh, akzent
+   typ:    'kurz' | 'lang' | 'muetze'    (Kopf-Variante)
+   pose:   'hoch' | 'monitor' | 'pult'   (Arm-Variante)
+   foto:   Pfad zu einem echten Bild. Leer lassen — dann wird das
+           flache Porträt aus der Figur gezeichnet.
+   links:  Einträge ohne url werden einfach nicht angezeigt.       */
 const DJS = [
   {
     id: 'dj-marco',
-    set: SET_PLATZHALTER, name: 'Marco K.', preis: 450,
+    set: SET_PLATZHALTER,
+    foto: '',
+    lang: 'Marco kennt den Punkt, an dem eine Feier kippt — und den, an dem sie hält. Er liest den Raum, statt eine Playlist abzuspielen: erst Disco und Soul, solange noch geredet wird, später Charts und House. Wünsche nimmt er den ganzen Abend entgegen, spielt sie aber dann, wenn sie passen.',
+    fakten: [['Dabei seit','2017'],
+              ['Spielt bis','offenes Ende'],
+              ['Anlage','auf Wunsch'],
+              ['Wunschliste','vorab']],
+    links: [
+      { titel: 'SoundCloud', url: SET_PLATZHALTER },
+      { titel: 'Website',    url: '' },   /* hier eintragen */
+      { titel: 'Instagram',  url: '' }    /* hier eintragen */
+    ], name: 'Marco K.', preis: 450,
     stil: 'House · Disco · Charts',
     text: 'Spielt seit acht Jahren Feiern und hat ein Gespür für die Uhrzeit. Holt die Eltern auf die Tanzfläche, bevor sie gehen wollen.',
     typ: 'kurz', pose: 'hoch', bart: true,
@@ -28,7 +42,18 @@ const DJS = [
   },
   {
     id: 'dj-nele',
-    set: SET_PLATZHALTER, name: 'Nele B.', preis: 520,
+    set: SET_PLATZHALTER,
+    foto: '',
+    lang: 'Nele springt zwischen den Jahrzehnten, ohne dass es holpert — 90er, 2000er, Charts, alles sauber ineinander. Wenn ihr wollt, übernimmt sie auch die Ansagen: Buffet, Rede, Tortenanschnitt. Das spart euch einen Moderator und klingt aus einer Hand.',
+    fakten: [['Dabei seit','2019'],
+              ['Spielt bis','3 Uhr'],
+              ['Moderation','inklusive'],
+              ['Wunschliste','vorab']],
+    links: [
+      { titel: 'SoundCloud', url: SET_PLATZHALTER },
+      { titel: 'Website',    url: '' },   /* hier eintragen */
+      { titel: 'Instagram',  url: '' }    /* hier eintragen */
+    ], name: 'Nele B.', preis: 520,
     stil: '90er bis Charts · Moderation',
     text: 'Breite Bandbreite, sauber gemixt, kein Bruch zwischen den Jahrzehnten. Übernimmt auf Wunsch auch die Ansagen des Abends.',
     typ: 'lang', pose: 'monitor', bart: false,
@@ -36,7 +61,18 @@ const DJS = [
   },
   {
     id: 'dj-tobi',
-    set: SET_PLATZHALTER, name: 'Tobi R.', preis: 600,
+    set: SET_PLATZHALTER,
+    foto: '',
+    lang: 'Tobi ist der für die zweite Hälfte der Nacht. Techno und House, durchgehend gemixt, kein Bruch. Er fährt eng am Licht — wir arbeiten oft zusammen, und er stimmt seine Sets vorher mit unserem Rig ab. Für kleine Räume ist er zu viel, für große genau richtig.',
+    fakten: [['Dabei seit','2021'],
+              ['Spielt bis','offenes Ende'],
+              ['Läuft mit','unserem Licht'],
+              ['Ab','80 Gästen']],
+    links: [
+      { titel: 'SoundCloud', url: SET_PLATZHALTER },
+      { titel: 'Website',    url: '' },   /* hier eintragen */
+      { titel: 'Instagram',  url: '' }    /* hier eintragen */
+    ], name: 'Tobi R.', preis: 600,
     stil: 'Techno · House',
     text: 'Für die späte Stunde. Spielt eng am Licht — läuft mit unserem Rig auf einer Wellenlänge, weil wir oft zusammen arbeiten.',
     typ: 'muetze', pose: 'pult', bart: false, brille: true,
@@ -63,8 +99,8 @@ const LICHT = [
   {
     id: 'licht-L', name: 'L', zusatz: 'Die Halle', gaeste: 'ab 150 Gäste', preis: 750,
     text: 'Vollausbau mit Seitentürmen und Laser, live gefahren auf GrandMA3. Für Hallen, Festzelte und große Flächen.',
-    rig: { trav: 600, koepfe: 12, sunbars: 6, tubes: 6, tuerme: true, laser: true, leute: 18 },
-    sicht: 1120,
+    rig: { trav: 560, koepfe: 12, sunbars: 6, tubes: 6, tuerme: true, laser: true, leute: 18 },
+    sicht: 1200,
     daten: [['Fläche','ab 300 m²'],['Traverse','12 m + 2 Türme'],['Movingheads','12'],['Sunbars','6'],['LED-Schläuche','6'],['Laser','inklusive'],['Crew','2 Personen']]
   }
 ];

@@ -133,6 +133,15 @@ function figur(dj) {
   return s.join('');
 }
 
+/* Kopf-Ausschnitt derselben Figur — dient als Porträt im Aufklapper,
+   solange es kein echtes Foto gibt. */
+function portraetSVG(dj) {
+  return `<svg viewBox="-68 -350 136 136" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="0" cy="-282" r="68" fill="${dj.look.akzent}" opacity=".16"/>
+    <g>${figur(dj)}</g>
+  </svg>`;
+}
+
 /* DJ-Pult, steht vor der Figur */
 function pult(L) {
   return `
@@ -174,7 +183,7 @@ function traverse(halb) {
                  stroke="#2E3444" stroke-width="6" fill="none" stroke-linecap="round"/>`;
   }
   return `
-    <g class="baut" style="--v:0">
+    <g class="baut" style="--v:.04">
       <rect x="${-halb}" y="${TRAV_Y}" width="${w}" height="8" rx="4" fill="#3A4152"/>
       ${zacken}
       <rect x="${-halb}" y="${TRAV_Y + 22}" width="${w}" height="8" rx="4" fill="#3A4152"/>
@@ -183,7 +192,7 @@ function traverse(halb) {
 
 function tuerme(halb) {
   const t = (x) => `
-    <g class="baut" style="--v:1">
+    <g class="baut" style="--v:.10">
       <rect x="${x - 13}" y="${TRAV_Y}" width="26" height="${-TRAV_Y}" rx="6" fill="#2E3444"/>
       <rect x="${x - 26}" y="-30" width="52" height="30" rx="6" fill="#3A4152"/>
     </g>`;
@@ -196,15 +205,19 @@ function kopf(x, farbe, i) {
   const lang  = -pivot;                 /* bis zum Boden */
   const dauer = (5.5 + (i % 4) * 1.3).toFixed(1);
   const start = (i % 5) * -1.7;
+  /* Die Lampe fliegt mit der Traverse ein, das Licht geht danach
+     einzeln an — darum zwei Verzögerungen. */
   return `
-  <g class="baut" style="--v:${2 + i * 0.06}">
+  <g class="baut" style="--v:${(0.06 + i * 0.012).toFixed(3)}">
    <g transform="translate(${x} ${pivot})">
     <g>
       ${anim({ type:'rotate', values:'-16;16;-16', dur:`${dauer}s`, begin:`${start}s`,
                calcMode:'spline', keyTimes:'0;0.5;1',
                keySplines:'0.45 0 0.55 1;0.45 0 0.55 1' })}
-      <polygon points="0,26 -78,${lang} 78,${lang}" fill="${farbe}" opacity=".16"/>
-      <polygon points="0,26 -26,${lang} 26,${lang}" fill="${farbe}" opacity=".22"/>
+      <g class="strahl" style="--v:${(0.42 + i * 0.05).toFixed(3)}">
+        <polygon points="0,26 -78,${lang} 78,${lang}" fill="${farbe}" opacity=".16"/>
+        <polygon points="0,26 -26,${lang} 26,${lang}" fill="${farbe}" opacity=".22"/>
+      </g>
       <rect x="-13" y="-6" width="26" height="16" rx="4" fill="#2A3040"/>
       <path d="M -15 8 L 15 8 L 11 40 L -11 40 Z" fill="#353C4D"/>
       <ellipse cx="0" cy="40" rx="11" ry="5" fill="${farbe}"/>
@@ -216,9 +229,10 @@ function kopf(x, farbe, i) {
 /* Sunbar am Boden, Fächer nach oben */
 function sunbar(x, farbe, i) {
   return `
-  <g class="baut baut--unten" style="--v:${1.2 + i * 0.08}">
+  <g class="baut baut--unten" style="--v:${(0.14 + i * 0.03).toFixed(3)}">
    <g transform="translate(${x} 0)">
-    <polygon points="-40,-18 40,-18 0,-430" fill="${farbe}" opacity=".16">
+    <polygon class="strahl" style="--v:${(0.5 + i * 0.05).toFixed(3)}"
+             points="-40,-18 40,-18 0,-430" fill="${farbe}" opacity=".16">
       ${animAttr({ attributeName:'opacity', values:'.07;.2;.07',
                    dur:`${(3.2 + i * 0.7).toFixed(1)}s`, begin:`${-i * 0.9}s` })}
     </polygon>
@@ -231,7 +245,7 @@ function sunbar(x, farbe, i) {
 /* LED-Schlauch, senkrecht */
 function tube(x, farbe, i) {
   return `
-  <g class="baut" style="--v:${1.6 + i * 0.08}">
+  <g class="baut" style="--v:${(0.5 + i * 0.05).toFixed(3)}">
     <rect x="${x - 22}" y="-440" width="44" height="380" rx="22" fill="${farbe}" opacity=".10"/>
     <rect x="${x - 6}"  y="-440" width="12" height="380" rx="6"  fill="${farbe}" opacity=".85">
       ${animAttr({ attributeName:'opacity', values:'.35;.9;.35',
@@ -250,7 +264,7 @@ function laser(halb) {
                               dur:'2.8s', begin:`${-i * 0.22}s` })}
                </line>`;
   }
-  return `<g class="baut" style="--v:2.4">${linien}</g>`;
+  return `<g class="baut" style="--v:.95">${linien}</g>`;
 }
 
 /* Publikum, flache Silhouetten vor allem anderen */
@@ -264,7 +278,7 @@ function publikum(anzahl, halb) {
     const sk = (0.52 + ((i * 17) % 4) * 0.07).toFixed(2);
     const dauer = (1.5 + ((i * 13) % 6) * 0.22).toFixed(2);
     g += `
-    <g class="baut baut--unten" style="--v:${2.6 + i * 0.05}">
+    <g class="baut baut--unten" style="--v:${(0.55 + i * 0.028).toFixed(3)}">
      <g transform="translate(${x + versatz} ${y}) scale(${sk})">
       <g>
         ${anim({ type:'translate', values:'0 0;0 -16;0 0', dur:`${dauer}s`,
@@ -299,35 +313,43 @@ class Szene {
 
     this.kamera = { x: -320, y: -440, w: 640, h: 540 };
     this.ziel   = { ...this.kamera };
+    this.von    = { ...this.kamera };
+    this.t0     = 0;
+    this.dauer  = 850;
     this.laeuft = false;
   }
 
-  /* ---------- Kamera ---------- */
-  setzeKamera(box, sofort = false) {
+  /* ---------- Kamera ----------
+     Feste Dauer statt Feder: der Zoom soll sitzen, nicht ausschwingen. */
+  setzeKamera(box, sofort = false, dauer = 850) {
     this.ziel = { x: box[0], y: box[1], w: box[2], h: box[3] };
+
     if (sofort || RUHIG) {
       this.kamera = { ...this.ziel };
+      this.laeuft = false;
       this.schreibeKamera();
       return;
     }
+
+    this.von   = { ...this.kamera };
+    this.t0    = performance.now();
+    this.dauer = dauer;
     if (!this.laeuft) {
       this.laeuft = true;
-      requestAnimationFrame(() => this.schritt());
+      requestAnimationFrame((t) => this.schritt(t));
     }
   }
 
-  schritt() {
-    const k = this.kamera, z = this.ziel;
-    const f = 0.12;
-    let fertig = true;
-    for (const s of ['x', 'y', 'w', 'h']) {
-      const d = z[s] - k[s];
-      if (Math.abs(d) > 0.4) { fertig = false; k[s] += d * f; }
-      else k[s] = z[s];
+  schritt(jetzt) {
+    if (!this.laeuft) return;
+    const p = Math.min(1, (jetzt - this.t0) / this.dauer);
+    const e = 1 - Math.pow(1 - p, 3);            /* ease-out */
+    for (const k of ['x', 'y', 'w', 'h']) {
+      this.kamera[k] = this.von[k] + (this.ziel[k] - this.von[k]) * e;
     }
     this.schreibeKamera();
-    if (fertig) this.laeuft = false;
-    else requestAnimationFrame(() => this.schritt());
+    if (p < 1) requestAnimationFrame((t) => this.schritt(t));
+    else this.laeuft = false;
   }
 
   schreibeKamera() {
@@ -338,6 +360,7 @@ class Szene {
 
   /* Kamera direkt versetzen (beim Wischen) */
   schiebe(x) {
+    this.laeuft = false;                 /* laufenden Schwenk abbrechen */
     this.kamera.x = x; this.ziel.x = x;
     this.schreibeKamera();
   }

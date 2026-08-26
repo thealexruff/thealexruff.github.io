@@ -20,7 +20,7 @@
 
   --korb-leiste:64px;
   --kopf-h:56px;
-  --flaeche-h:44dvh;          /* wie viel Bild vor dem Blatt zu sehen ist */
+  --flaeche-h:46dvh;          /* wie viel Bild vor dem Blatt zu sehen ist */
   --sicher: env(safe-area-inset-bottom, 0px);
 }
 
@@ -28,6 +28,10 @@
 [hidden]{display:none!important}
 
 html,body{height:100%}
+/* Kein Scrollen, solange alles ins Bild passt. Sobald ein Aufklapper
+   den Inhalt über den Rand schiebt, setzt app.js data-scroll="true". */
+body{overflow:hidden}
+body[data-scroll="true"]{overflow-y:auto}
 body{
   margin:0;
   background:var(--bg);
@@ -143,13 +147,24 @@ button{font:inherit;color:inherit}
   pointer-events:none;
 }
 
-/* Aufbau-Animation der Rig-Teile */
-.baut{animation:aufbau .55s var(--weich) both;animation-delay:calc(var(--v,0) * .06s)}
+/* Aufbau: --v ist die Verzögerung in Sekunden.
+   Traverse und Lampen fliegen von oben ein, danach gehen die Strahlen
+   einzeln an. Alles zusammen unter anderthalb Sekunden. */
+.baut{
+  animation:aufbau .42s cubic-bezier(.2,1.2,.4,1) both;
+  animation-delay:calc(var(--v,0) * 1s);
+}
 .baut--unten{animation-name:aufbau-unten}
-@keyframes aufbau{from{opacity:0;transform:translateY(-26px)}to{opacity:1;transform:none}}
-@keyframes aufbau-unten{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.strahl{
+  animation:anleuchten .3s ease-out both;
+  animation-delay:calc(var(--v,0) * 1s);
+}
+@keyframes aufbau{from{opacity:0;transform:translateY(-90px)}to{opacity:1;transform:none}}
+@keyframes aufbau-unten{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+@keyframes anleuchten{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){
-  .baut{animation:none}
+  .baut,.strahl{animation:none}
+  .klapp{transition:none}
   *{scroll-behavior:auto}
 }
 
@@ -184,22 +199,27 @@ button{font:inherit;color:inherit}
 }
 @media (prefers-reduced-motion:reduce){ .ton::after{animation:none} }
 
-/* ---------- SoundCloud-Player ---------- */
-/* Nur die Höhe wird geschaltet — der iframe bleibt im Baum, sonst
-   würde die Musik beim Schrittwechsel abreißen. */
-.klang{
-  height:0;overflow:hidden;opacity:0;
-  padding:0 16px;                    /* nie senkrecht polstern — sonst
-                                        bleibt bei height:0 ein Rest stehen */
-  transition:height .3s var(--weich),opacity .2s ease,margin .3s var(--weich);
+/* ---------- Aufklapper ----------
+   0fr → 1fr klappt auf, ohne den Inhalt aus dem Bau zu nehmen.
+   Wichtig für den Player: display:none würde die Musik anhalten. */
+.klapp{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows .32s var(--weich);
 }
-.klang[data-sichtbar="true"]{height:142px;opacity:1;margin:6px 0 2px}
-.klang iframe{display:block;width:100%;height:130px;border:0;border-radius:12px;overflow:hidden}
+.klapp>*{overflow:hidden;min-height:0}
+.klapp[data-offen="true"]{grid-template-rows:1fr}
+
+/* ---------- SoundCloud-Player ---------- */
+/* Steckt im Aufklapper unter dem DJ und ist zugeklappt nur verdeckt,
+   nicht entfernt — sonst reißt die Musik ab. */
+.klang{margin-top:14px}
+.klang iframe{display:block;width:100%;height:130px;border:0;border-radius:12px}
 
 /* ---------- Mehr-Schalter ---------- */
 .mehr{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  width:100%;margin-top:14px;padding:11px 0;
+  width:100%;margin-top:11px;padding:9px 0;
   background:none;border:0;border-top:1px solid var(--linie);
   font-size:14px;color:var(--leise);cursor:pointer;
 }
@@ -218,39 +238,43 @@ button{font:inherit;color:inherit}
   border-radius:26px 26px 0 0;
   background:var(--bg);
   box-shadow:0 -20px 44px rgba(0,0,0,.6);
-  /* immer genug Höhe, damit sich das Blatt ganz über die Fläche
-     schieben lässt */
-  min-height:calc(100dvh - var(--kopf-h) - var(--korb-leiste));
-  padding-bottom:24px;
+  padding-top:10px;      /* verhindert, dass der Griff seinen Rand
+                            nach außen kollabieren lässt */
+  /* Genau so hoch, dass Kopf + Fläche + Blatt + Korbleiste zusammen
+     eine Bildschirmhöhe ergeben — dann scrollt zugeklappt nichts. */
+  min-height:calc(100dvh - var(--kopf-h) - var(--flaeche-h) + 26px
+                  - var(--korb-leiste) - var(--sicher));
+  padding-bottom:16px;
 }
 .blatt__griff{
   display:block;width:40px;height:4px;border-radius:2px;
-  background:var(--linie);margin:10px auto 2px;
+  background:var(--linie);margin:0 auto 2px;
 }
-.wahl{padding:10px 16px 20px}
+.wahl{padding:8px 16px 14px}
+.wahl:empty{display:none}   /* im DJ-Schritt leer — soll dann auch keinen Platz nehmen */
 .karte{
   background:var(--flaeche);
   border:1px solid var(--linie);
   border-radius:var(--r-karte);
-  padding:18px 16px;
+  padding:15px 16px;
 }
 .karte__kopf{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
 .hut{
   display:block;font-size:11px;font-weight:600;letter-spacing:.09em;
   text-transform:uppercase;color:var(--apricot);margin-bottom:5px;
 }
-.karte__titel{font-size:26px;line-height:1.15}
+.karte__titel{font-size:25px;line-height:1.1}
 .karte__stil{margin:4px 0 0;font-size:14px;color:var(--leise)}
 .preis{font-size:20px;font-weight:600;white-space:nowrap;flex:none;padding-top:16px}
 .karte__text{margin:12px 0 0;font-size:14.5px;color:var(--leise)}
 .karte__text--leise{font-size:13.5px}
-.karte__fuss{margin-top:16px}
+.karte__fuss{margin-top:13px}
 .karte__fuss--reihe{display:flex;gap:10px}
 .karte__fuss--reihe .knopf{flex:1}
 
 .knopf{
   border:1px solid transparent;border-radius:var(--r-knopf);
-  padding:13px 20px;font-size:15px;font-weight:600;
+  padding:12px 20px;font-size:15px;font-weight:600;
   cursor:pointer;transition:transform .12s ease,filter .18s ease,background .18s ease;
 }
 .knopf:active{transform:scale(.98)}
@@ -263,17 +287,39 @@ button{font:inherit;color:inherit}
   text-underline-offset:3px;cursor:pointer;
 }
 
+/* ---------- Porträt und Links im Aufklapper ---------- */
+.portraet{
+  width:104px;height:104px;flex:none;
+  border-radius:50%;overflow:hidden;
+  background:var(--flaeche-hoch);
+  margin:2px 0 14px;
+}
+.portraet svg,.portraet img{display:block;width:100%;height:100%;object-fit:cover}
+
+#djFakten{grid-template-columns:1fr}
+
+.links{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:14px 0 0;padding:0}
+.link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:var(--r-knopf);
+  border:1px solid var(--linie);background:var(--flaeche-hoch);
+  color:var(--text);text-decoration:none;font-size:13.5px;font-weight:500;
+  transition:border-color .2s ease,background .2s ease;
+}
+.link svg{width:14px;height:14px;color:var(--leise)}
+@media (hover:hover){ .link:hover{border-color:var(--apricot)} .link:hover svg{color:var(--apricot)} }
+
 /* ---------- Größen S M L ---------- */
-.groessen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.groessen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
 .groesse{
   display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:14px 6px;border-radius:14px;
+  padding:10px 6px;border-radius:14px;
   border:1px solid var(--linie);background:var(--flaeche-hoch);
   cursor:pointer;transition:border-color .2s ease,background .2s ease;
 }
-.groesse b{font-size:22px;font-weight:600;line-height:1.1}
-.groesse small{font-size:11px;color:var(--leise);text-align:center;line-height:1.25}
-.groesse span{font-size:13px;font-weight:600;color:var(--apricot);margin-top:4px}
+.groesse b{font-size:21px;font-weight:600;line-height:1.05}
+.groesse small{font-size:11px;color:var(--leise);text-align:center;line-height:1.2}
+.groesse span{font-size:13px;font-weight:600;color:var(--apricot);margin-top:2px}
 .groesse[aria-pressed="true"]{
   border-color:var(--apricot);background:rgba(249,161,99,.10);
 }
@@ -389,7 +435,7 @@ button{font:inherit;color:inherit}
    Fläche liegt fest, das Blatt scrollt darüber, der Korb steht rechts.
    ================================================================== */
 @media (min-width:1000px){
-  :root{ --korb-b:380px; --flaeche-h:60dvh; --kopf-h:60px; }
+  :root{ --korb-b:380px; --flaeche-h:50dvh; --kopf-h:60px; }
 
   .app{padding-right:var(--korb-b);padding-bottom:0}
   .kopf{right:var(--korb-b);padding:0 32px}
@@ -397,11 +443,12 @@ button{font:inherit;color:inherit}
 
   .blatt{
     margin-top:-26px;
-    padding-bottom:60px;
-    min-height:calc(100dvh - var(--kopf-h));
+    padding-bottom:22px;
+    /* wie mobil: zugeklappt füllt alles zusammen genau eine Bildhöhe */
+    min-height:calc(100dvh - var(--kopf-h) - var(--flaeche-h) + 26px);
   }
   .blatt__griff{display:none}
-  .wahl{padding:22px 32px 30px}
+  .wahl{padding:16px 32px 18px}
   .klang{padding:0 32px}
   .klang[data-sichtbar="true"]{height:180px;margin:16px 0 4px}
   .klang iframe{height:180px}
@@ -429,7 +476,7 @@ button{font:inherit;color:inherit}
 
 @media (min-width:1280px){
   :root{ --korb-b:400px }
-  .wahl{padding:24px 44px 32px}
+  .wahl{padding:18px 44px 20px}
   .klang{padding:0 44px}
   .kopf{padding:0 44px}
 }

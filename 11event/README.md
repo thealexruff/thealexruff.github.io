@@ -8,18 +8,24 @@ Die Landingpage kommt später dazu.
 Statt einer langen Scrollseite mit vielen Optionen gibt es **eine Fläche**,
 die mit der Auswahl wächst:
 
-1. **DJ** — drei flache Figuren, horizontal durchwischbar. Zu jedem läuft
-   sein SoundCloud-Set im Player darunter. Wer gewählt wird, rückt in die
-   Mitte, die anderen verschwinden — und die Musik startet.
+1. **DJ** — drei flache Figuren, horizontal durchwischbar. Ganz oben steht
+   der Name, sonst nichts. Alles Weitere — Porträt, Text, Eckdaten, Links
+   und der SoundCloud-Player — steckt hinter "Über …". Beim Blättern
+   wechselt der Mix automatisch mit.
 2. **Licht** — **S ist immer dabei** (inklusive) und baut sich sofort nach
-   der DJ-Wahl um die Figur herum auf. M und L sind Ausbaustufen davon;
-   "kein Licht" gibt es nicht. Der Bildausschnitt zoomt mit: die Fläche
-   wird sichtbar größer.
+   der DJ-Wahl um die Figur herum auf: der DJ bleibt stehen, die Kamera
+   fährt heraus, die Traverse fliegt ein, die Strahlen gehen einzeln an.
+   Rund anderthalb Sekunden. M und L sind Ausbaustufen davon;
+   "kein Licht" gibt es nicht.
 3. **Anfrage** — Formular, öffnet das Mailprogramm mit der Zusammenstellung.
 
 Die Fläche liegt fest im Hintergrund, das Blatt mit den Optionen scrollt
-darüber. Jede Karte zeigt nur das Nötige; Details stehen hinter
-"Was ist dabei?" bzw. "Über …".
+darüber. **Zugeklappt passt alles auf einen Bildschirm — dann scrollt
+nichts.** Erst wenn ein Aufklapper den Inhalt über den Rand schiebt,
+setzt `scrollPruefen()` in `app.js` `data-scroll="true"` am `<body>` und
+das Scrollen geht an. Die Höhen dafür hängen an `--flaeche-h` und der
+`min-height` von `.blatt` — wer eine davon ändert, sollte kurz
+nachmessen.
 
 Der Warenkorb läuft die ganze Zeit mit: unten als ausklappbares Blatt (mobil),
 rechts als Spalte (Desktop).
@@ -28,15 +34,24 @@ rechts als Spalte (Desktop).
 
 Ein einziger SoundCloud-Player (`js/klang.js`), der nie neu erzeugt und nie
 im Baum verschoben wird — sonst würde die Musik beim Schrittwechsel abreißen.
-Sichtbar ist er nur im DJ-Schritt, weiter läuft er trotzdem.
+Er steckt im Aufklapper unter dem DJ und ist zugeklappt nur verdeckt, nicht
+entfernt: die `.klapp`-Technik (`grid-template-rows: 0fr → 1fr`) klappt zu,
+ohne den Inhalt aus dem Bau zu nehmen. **Kein `display:none` auf dem
+`<iframe>`** — das würde die Musik anhalten.
+
+Beim Blättern durch die DJs startet der neue Mix sofort.
 
 Der große runde Knopf auf der Fläche ist ein **Schalter, kein Pause-Knopf**:
 solange stumm an ist, startet auch beim Auswählen eines DJs nichts von allein.
 Erst beim Entstummen geht es los.
 
 > **Noch zu tun:** in `js/data.js` steht bei allen drei DJs derselbe
-> Platzhalter-Track (`SET_PLATZHALTER`). Da gehören die echten
-> SoundCloud-Adressen der DJs hin.
+> Platzhalter-Track (`SET_PLATZHALTER`), und bei `links` sind Website
+> und Instagram leer. Einträge ohne `url` werden nicht angezeigt —
+> einfach eintragen, dann erscheinen sie.
+>
+> `foto` ist ebenfalls leer. Solange da nichts steht, wird als Porträt
+> der Kopf der flachen Figur gezeichnet.
 
 ## Dateien
 
