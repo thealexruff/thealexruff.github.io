@@ -1,0 +1,357 @@
+/* ==================================================================
+   11event Konfigurator — mobile first.
+   Marke: Kobalt #2645C9, Apricot #F9A163.
+   ================================================================== */
+
+:root{
+  --bg:#0B0B0E;
+  --flaeche:#15161C;
+  --flaeche-hoch:#1C1E26;
+  --linie:#282A34;
+  --text:#F4F4F7;
+  --leise:#9A9AA6;
+  --kobalt:#2645C9;
+  --apricot:#F9A163;
+  --apricot-dunkel:#1A0F06;
+
+  --r-karte:18px;
+  --r-knopf:999px;
+  --weich:cubic-bezier(.22,1,.36,1);
+
+  --korb-leiste:64px;
+  --sicher: env(safe-area-inset-bottom, 0px);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior-y:none;
+}
+h1,h2{margin:0;font-weight:600;letter-spacing:-.02em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--apricot);outline-offset:3px;border-radius:8px}
+
+/* ---------- Grundgerüst ---------- */
+/* Eine Fläche, kein Scrollen: der Canvas bleibt immer sichtbar.
+   Nur der Auswahlbereich scrollt, wenn er zu hoch wird. */
+.app{
+  display:flex;
+  flex-direction:column;
+  height:100dvh;
+  overflow:hidden;
+  padding-bottom:calc(var(--korb-leiste) + var(--sicher));
+}
+
+/* ---------- Kopf ---------- */
+.kopf{
+  display:flex;align-items:center;gap:14px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--linie);
+  background:var(--bg);
+}
+.marke{
+  display:inline-flex;align-items:center;gap:2px;
+  font-weight:700;letter-spacing:-.03em;font-size:17px;
+  color:var(--text);text-decoration:none;flex:none;
+}
+.marke__eins{
+  width:5px;height:16px;border-radius:3px;
+  background:var(--apricot);display:inline-block;
+}
+.marke__eins+.marke__eins{margin-right:5px}
+
+.schritte{
+  display:flex;align-items:center;gap:4px;
+  list-style:none;margin:0;padding:0;margin-left:auto;
+}
+.schritt{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:0;padding:6px 8px;border-radius:var(--r-knopf);
+  color:var(--leise);cursor:pointer;
+  transition:color .2s ease,background .2s ease;
+}
+.schritt:disabled{opacity:.4;cursor:default}
+.schritt__nr{
+  display:grid;place-items:center;
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid currentColor;
+  font-size:11px;font-weight:600;flex:none;
+}
+.schritt__label{font-size:13px;display:none}
+.schritt[aria-current="step"]{color:var(--text)}
+.schritt[aria-current="step"] .schritt__label{display:inline}
+.schritt[data-fertig="true"] .schritt__nr{
+  background:var(--apricot);border-color:var(--apricot);color:var(--apricot-dunkel);
+}
+
+/* ---------- Bühne / Canvas ---------- */
+.buehne{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  background:
+    radial-gradient(120% 80% at 50% 8%, #14161E 0%, #0B0B0E 72%);
+  overflow:hidden;
+}
+.szene{
+  position:absolute;inset:0;
+  display:block;width:100%;height:100%;
+  touch-action:pan-y;
+  cursor:grab;
+}
+.szene.greift{cursor:grabbing}
+
+.szene__nav{
+  position:absolute;left:0;right:0;bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  pointer-events:none;
+}
+.szene__nav>*{pointer-events:auto}
+.pfeil{
+  width:40px;height:40px;flex:none;
+  display:grid;place-items:center;
+  border:1px solid var(--linie);border-radius:50%;
+  background:rgba(11,11,14,.7);backdrop-filter:blur(8px);
+  cursor:pointer;transition:opacity .2s ease,border-color .2s ease;
+}
+.pfeil svg{width:20px;height:20px}
+.pfeil:disabled{opacity:.25;cursor:default}
+.punkte{display:flex;gap:8px;align-items:center}
+.punkt{
+  width:8px;height:8px;padding:0;border:0;border-radius:50%;
+  background:#3A3D4A;cursor:pointer;transition:all .25s var(--weich);
+}
+.punkt[aria-current="true"]{background:var(--apricot);width:22px;border-radius:4px}
+
+.wischhinweis{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  margin:0;font-size:12px;color:var(--leise);
+  background:rgba(11,11,14,.6);padding:4px 12px;border-radius:var(--r-knopf);
+  pointer-events:none;
+}
+
+/* Aufbau-Animation der Rig-Teile */
+.baut{animation:aufbau .55s var(--weich) both;animation-delay:calc(var(--v,0) * .06s)}
+.baut--unten{animation-name:aufbau-unten}
+@keyframes aufbau{from{opacity:0;transform:translateY(-26px)}to{opacity:1;transform:none}}
+@keyframes aufbau-unten{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .baut{animation:none}
+  *{scroll-behavior:auto}
+}
+
+/* ---------- Auswahlkarte ---------- */
+.wahl{
+  flex:0 0 auto;
+  max-height:52%;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 16px 20px;
+}
+.karte{
+  background:var(--flaeche);
+  border:1px solid var(--linie);
+  border-radius:var(--r-karte);
+  padding:18px 16px;
+}
+.karte__kopf{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
+.hut{
+  display:block;font-size:11px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--apricot);margin-bottom:5px;
+}
+.karte__titel{font-size:26px;line-height:1.15}
+.karte__stil{margin:4px 0 0;font-size:14px;color:var(--leise)}
+.preis{font-size:20px;font-weight:600;white-space:nowrap;flex:none;padding-top:16px}
+.karte__text{margin:12px 0 0;font-size:14.5px;color:var(--leise)}
+.karte__text--leise{font-size:13.5px}
+.karte__fuss{margin-top:16px}
+.karte__fuss--reihe{display:flex;gap:10px}
+.karte__fuss--reihe .knopf{flex:1}
+
+.knopf{
+  border:1px solid transparent;border-radius:var(--r-knopf);
+  padding:13px 20px;font-size:15px;font-weight:600;
+  cursor:pointer;transition:transform .12s ease,filter .18s ease,background .18s ease;
+}
+.knopf:active{transform:scale(.98)}
+.knopf--voll{background:var(--apricot);color:var(--apricot-dunkel);width:100%}
+.knopf--voll:disabled{background:var(--flaeche-hoch);color:var(--leise);cursor:default}
+.knopf--leer{background:transparent;border-color:var(--linie);color:var(--text)}
+.textlink{
+  display:block;margin:12px auto 0;background:none;border:0;
+  font-size:13px;color:var(--leise);text-decoration:underline;
+  text-underline-offset:3px;cursor:pointer;
+}
+
+/* ---------- Größen S M L ---------- */
+.groessen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.groesse{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:14px 6px;border-radius:14px;
+  border:1px solid var(--linie);background:var(--flaeche-hoch);
+  cursor:pointer;transition:border-color .2s ease,background .2s ease;
+}
+.groesse b{font-size:22px;font-weight:600;line-height:1.1}
+.groesse small{font-size:11px;color:var(--leise);text-align:center;line-height:1.25}
+.groesse span{font-size:13px;font-weight:600;color:var(--apricot);margin-top:4px}
+.groesse[aria-pressed="true"]{
+  border-color:var(--apricot);background:rgba(249,161,99,.10);
+}
+
+.daten{
+  display:grid;grid-template-columns:1fr 1fr;gap:0 18px;
+  margin:14px 0 0;padding:14px 0 0;border-top:1px solid var(--linie);
+}
+.daten div{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:13px}
+.daten dt{color:var(--leise);margin:0}
+.daten dd{margin:0;font-weight:500}
+
+/* ---------- Formular ---------- */
+.felder{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.feld{display:flex;flex-direction:column;gap:5px}
+.feld--breit{grid-column:1/-1}
+.feld span{font-size:12px;color:var(--leise)}
+.feld input,.feld textarea{
+  width:100%;background:var(--flaeche-hoch);color:var(--text);
+  border:1px solid var(--linie);border-radius:12px;
+  padding:11px 12px;font:inherit;font-size:15px;
+}
+.feld textarea{resize:vertical}
+.feld input:focus,.feld textarea:focus{outline:none;border-color:var(--apricot)}
+
+.bald{display:flex;gap:8px;margin-top:16px}
+.bald__karte{
+  flex:1;padding:12px;border-radius:14px;
+  border:1px dashed var(--linie);color:var(--leise);
+}
+.bald__karte b{display:block;font-size:14px;color:var(--text);opacity:.6}
+.bald__karte small{font-size:12px}
+
+.fein{font-size:12px;color:var(--leise);margin:12px 0 0}
+
+/* ---------- Warenkorb ---------- */
+.korb{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:var(--flaeche);
+  border-top:1px solid var(--linie);
+  border-radius:20px 20px 0 0;
+  transform:translateY(calc(100% - var(--korb-leiste) - var(--sicher)));
+  transition:transform .38s var(--weich);
+  max-height:88dvh;display:flex;flex-direction:column;
+  padding-bottom:var(--sicher);
+}
+.korb[data-offen="true"]{transform:translateY(0)}
+
+.korb__leiste{
+  display:flex;align-items:center;gap:12px;
+  width:100%;height:var(--korb-leiste);flex:none;
+  padding:0 16px;background:none;border:0;cursor:pointer;text-align:left;
+}
+.korb__chevron{display:grid;place-items:center;width:24px;height:24px;color:var(--leise);flex:none}
+.korb__chevron svg{width:22px;height:22px;transition:transform .38s var(--weich)}
+.korb[data-offen="true"] .korb__chevron svg{transform:rotate(180deg)}
+.korb__label{font-size:14px;color:var(--leise)}
+.korb__summe{margin-left:auto;font-size:18px;font-weight:600}
+
+.korb__inhalt{
+  padding:0 16px 18px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.korb__titel{font-size:18px;margin-bottom:10px}
+.korb__leer{font-size:13.5px;color:var(--leise);margin:0 0 4px}
+
+.posten{list-style:none;margin:0;padding:0}
+.posten__zeile{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 0;border-bottom:1px solid var(--linie);
+}
+.posten__punkt{width:9px;height:9px;border-radius:50%;flex:none}
+.posten__punkt--dj{background:var(--kobalt)}
+.posten__punkt--licht{background:var(--apricot)}
+.posten__text{display:flex;flex-direction:column;min-width:0;flex:1}
+.posten__text b{font-size:14.5px;font-weight:600}
+.posten__text small{font-size:12px;color:var(--leise);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.posten__preis{font-size:14.5px;font-weight:600;white-space:nowrap}
+.posten__weg{
+  width:28px;height:28px;flex:none;display:grid;place-items:center;
+  background:none;border:0;border-radius:50%;color:var(--leise);cursor:pointer;
+}
+.posten__weg svg{width:16px;height:16px}
+
+.korb__fuss{margin-top:16px}
+.korb__gesamt{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14px;color:var(--leise);
+}
+.korb__gesamt b{font-size:24px;font-weight:600;color:var(--text)}
+.korb__fuss .knopf{margin-top:14px}
+
+.korb__schleier{
+  position:fixed;inset:0;z-index:20;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(2px);
+}
+
+/* ==================================================================
+   Ab Tablet
+   ================================================================== */
+@media (min-width:640px){
+  .schritt__label{display:inline}
+  .wahl{padding:18px 24px 24px}
+  .karte{padding:22px}
+  .karte__titel{font-size:30px}
+  .kopf{padding:12px 24px}
+}
+
+/* ==================================================================
+   Desktop — Warenkorb als Spalte
+   ================================================================== */
+@media (min-width:1000px){
+  .app{
+    display:grid;
+    grid-template-columns:1fr 360px;
+    grid-template-rows:auto minmax(0,1fr) auto;
+    grid-template-areas:
+      "kopf korb"
+      "buehne korb"
+      "wahl korb";
+    height:100dvh;min-height:0;padding-bottom:0;
+  }
+  .kopf{grid-area:kopf}
+  .buehne{grid-area:buehne;min-height:0}
+  .wahl{grid-area:wahl;max-height:34vh;padding:20px 28px 26px}
+  .karte{max-width:none}
+
+  .korb{
+    grid-area:korb;position:relative;
+    transform:none!important;border-radius:0;
+    border-top:0;border-left:1px solid var(--linie);
+    max-height:none;height:100dvh;padding-bottom:0;
+  }
+  .korb__leiste{display:none}
+  .korb__inhalt{padding:24px;display:flex;flex-direction:column;flex:1}
+  .korb__titel{font-size:20px;margin-bottom:14px}
+  .korb__fuss{margin-top:auto;padding-top:20px}
+  .korb__schleier{display:none}
+
+  .wischhinweis{top:16px}
+  .szene__nav{bottom:16px}
+  .karte__kopf{align-items:baseline}
+  .preis{font-size:24px;padding-top:0}
+  .bald__karte{padding:14px}
+}
+
+@media (min-width:1280px){
+  .app{grid-template-columns:1fr 400px}
+  .wahl{padding:22px 40px 30px}
+  .kopf{padding:14px 40px}
+}
