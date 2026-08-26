@@ -76,3 +76,14 @@ in `data.js` und `app.js` ist dafür schon angelegt.
 ```bash
 python3 -m http.server 4311
 ```
+
+## Nach dem Hochladen: Cache
+
+GitHub Pages schickt `Cache-Control: max-age=14400` — der Browser hält
+Dateien also bis zu vier Stunden fest. Damit Änderungen sofort ankommen,
+hängt an CSS und JS in `index.html` ein `?v=…`. **Nach jeder Änderung
+diese Zahl hochzählen.**
+
+Die `index.html` selbst wird ebenfalls gecacht. Wer sofort die neue Version
+sehen will, hängt einmal eine beliebige Query an die Adresse:
+`…/11event/?neu`
