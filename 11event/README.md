@@ -12,12 +12,17 @@ die mit der Auswahl wächst:
    der Name, sonst nichts. Alles Weitere — Porträt, Text, Eckdaten, Links
    und der SoundCloud-Player — steckt hinter "Über …". Beim Blättern
    wechselt der Mix automatisch mit.
-2. **Licht** — **S ist immer dabei** (inklusive) und baut sich sofort nach
+2. **Stage** — **S ist immer dabei** (inklusive) und baut sich sofort nach
    der DJ-Wahl um die Figur herum auf: der DJ bleibt stehen, die Kamera
    fährt heraus, die Traverse fliegt ein, die Strahlen gehen einzeln an.
    Rund anderthalb Sekunden. M und L sind Ausbaustufen davon;
-   "kein Licht" gibt es nicht.
-3. **Anfrage** — Formular, öffnet das Mailprogramm mit der Zusammenstellung.
+   "keine Stage" gibt es nicht.
+3. **Skin** — Deko, die sich um das Rig legt. *Pur* ist inklusive,
+   *Blüten* hängt Girlanden an die Traverse und stellt Blumensäulen
+   und einen Bogen dazu, *Mainstage* baut Winkelportale, eine Panelwand,
+   Finnen und eine Krone. Die Kamera fährt für die höheren Aufbauten
+   etwas weiter heraus (`hoehe` in `data.js`).
+4. **Anfrage** — Formular, öffnet das Mailprogramm mit der Zusammenstellung.
 
 Die Fläche liegt fest im Hintergrund, das Blatt mit den Optionen scrollt
 darüber. **Zugeklappt passt alles auf einen Bildschirm — dann scrollt
@@ -29,6 +34,29 @@ nachmessen.
 
 Der Warenkorb läuft die ganze Zeit mit: unten als ausklappbares Blatt (mobil),
 rechts als Spalte (Desktop).
+
+## Warum das Rig nicht neu gebaut wird
+
+Beim Wechsel der Größe oder des Skins wird **abgeglichen statt neu gebaut**.
+Jedes Bauteil hat einen festen Schlüssel (`trav-3`, `kopf7`, `deko-gir2` …).
+`Szene.plan()` stellt die Wunschliste auf, `abgleichen()` vergleicht sie mit
+dem, was schon steht:
+
+* gleicher Schlüssel → der DOM-Knoten **bleibt** und rückt höchstens an
+  seinen neuen Platz (CSS-`transition` auf `transform`),
+* neuer Schlüssel → poppt auf, mit kurzer Staffelung nach Bauteil-Art,
+* fehlender Schlüssel → fliegt raus.
+
+Damit das aufgeht, sind alle Positionen aus festen Rastern abgeleitet:
+Ein Traversenstück ist immer 45 breit, und die kleinere Größe ist immer
+die **Mitte** der größeren (8 → 16 → 24 Stücke). Lampenplätze wachsen mit
+`platz(k, …)` von der Mitte nach außen, Platz 3 liegt also bei S, M und L
+an derselben Stelle. **Wer die Zahlen in `rig` ändert, sollte das
+beibehalten** — sonst springt beim Wechsel wieder alles.
+
+Dasselbe beim Zurückgehen zur DJ-Auswahl: die Bühne wird abgebaut, und
+das Karussell wird so aufgebaut, dass der gewählte DJ bei x = 0 steht
+(`baueDjs(DJS, index)`). Dadurch schwenkt die Kamera nicht zur Seite.
 
 ## Ton
 
@@ -60,7 +88,7 @@ Erst beim Entstummen geht es los.
 | `index.html`   | Gerüst |
 | `css/style.css`| Gestaltung, mobile first |
 | `js/data.js`   | **Namen, Preise, Texte, Aussehen der Figuren** — hier pflegen |
-| `js/scene.js`  | Alles, was gezeichnet wird (Figuren, Rig, Kamera) |
+| `js/scene.js`  | Alles, was gezeichnet wird (Figuren, Rig, Deko, Kamera) |
 | `js/klang.js`  | Der eine SoundCloud-Player, Stummschalter |
 | `js/app.js`    | Zustand, Schritte, Warenkorb |
 

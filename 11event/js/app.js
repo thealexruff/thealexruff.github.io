@@ -14,7 +14,8 @@ const preisText = (n) => (n === 0 ? 'inklusive' : euro(n));
 
 const SCHRITTE = [
   { id: 'dj',      label: 'DJ' },
-  { id: 'licht',   label: 'Licht' },
+  { id: 'stage',   label: 'Stage' },
+  { id: 'skin',    label: 'Skin' },
   { id: 'anfrage', label: 'Anfrage' }
 ];
 
@@ -23,8 +24,9 @@ const zustand = {
   karussell: true,     /* steht die DJ-Auswahl gerade offen? */
   djIndex: 0,          /* welcher DJ gerade in der Mitte steht */
   dj: null,            /* gewählte id */
-  licht: null,         /* nie leer, sobald ein DJ steht — S ist immer dabei */
-  details: { dj: false, licht: false },   /* aufgeklappte Detailblöcke */
+  stage: null,         /* nie leer, sobald ein DJ steht — S ist immer dabei */
+  skin: null,          /* dito — Pur ist immer dabei */
+  details: { dj: false, stage: false, skin: false },
   formular: { name: '', mail: '', datum: '', ort: '', gaeste: '', text: '' }
 };
 
@@ -37,12 +39,19 @@ function posten() {
   const p = [];
   const dj = DJS.find(d => d.id === zustand.dj);
   if (dj) p.push({ art: 'dj', titel: dj.name, unter: `DJ · ${dj.stil}`, preis: dj.preis });
-  const li = LICHT.find(l => l.id === zustand.licht);
-  if (li) p.push({
-    art: 'licht', titel: `Eventlicht ${li.name}`,
-    unter: `${li.zusatz} · ${li.gaeste}`,
-    preis: li.preis,
-    fest: !!li.inklusive          /* S lässt sich nicht entfernen */
+  const st = STAGE.find(l => l.id === zustand.stage);
+  if (st) p.push({
+    art: 'stage', titel: `Stage ${st.name}`,
+    unter: `${st.zusatz} · ${st.gaeste}`,
+    preis: st.preis,
+    fest: !!st.inklusive          /* S lässt sich nicht entfernen */
+  });
+  const sk = SKINS.find(l => l.id === zustand.skin);
+  if (sk) p.push({
+    art: 'skin', titel: `Skin ${sk.name}`,
+    unter: sk.zusatz,
+    preis: sk.preis,
+    fest: !!sk.inklusive
   });
   return p;
 }
@@ -83,7 +92,8 @@ function korbZeichnen() {
    ------------------------------------------------------------------ */
 function schrittleiste() {
   $('#schritte').innerHTML = SCHRITTE.map((s, i) => {
-    const fertig = (i === 0 && zustand.dj) || (i === 1 && zustand.licht);
+    const fertig = (i === 0 && zustand.dj) || (i === 1 && zustand.stage)
+                || (i === 2 && zustand.skin);
     const aktiv  = i === zustand.schritt;
     const offen  = i <= erreichbar();
     return `<li>
@@ -98,7 +108,7 @@ function schrittleiste() {
   }).join('');
 }
 
-const erreichbar = () => (zustand.dj ? 2 : 0);
+const erreichbar = () => (zustand.dj ? SCHRITTE.length - 1 : 0);
 
 /* ------------------------------------------------------------------
    Auswahlbereich
@@ -110,7 +120,8 @@ function wahlZeichnen() {
   $('#djBlock').dataset.offen = String(s === 'dj');
 
   $('#wahl').innerHTML =
-    s === 'licht'   ? wahlLicht()   :
+    s === 'stage'   ? wahlStufen(STAGE, 'stage', 'Stage', 'Wie groß ist der Raum?') :
+    s === 'skin'    ? wahlStufen(SKINS, 'skin',  'Skin',  'Wie soll es aussehen?') :
     s === 'anfrage' ? wahlAnfrage() : '';
 
   $('#szeneNav').hidden     = !zustand.karussell;
@@ -162,33 +173,39 @@ function djKarteZeichnen() {
   $('#djMehr').setAttribute('aria-expanded', String(zustand.details.dj));
 }
 
-function wahlLicht() {
-  const gew = LICHT.find(l => l.id === zustand.licht) || LICHT[0];
+/* Stage und Skin sehen gleich aus: drei Stufen, Details hinter einem
+   Schalter. Darum eine Vorlage für beide. */
+function wahlStufen(liste, feld, hut, frage) {
+  const gew = liste.find(l => l.id === zustand[feld]) || liste[0];
+  const offen = zustand.details[feld];
+  const zurueck = SCHRITTE.findIndex(s => s.id === feld) - 1;
+  const weiter  = SCHRITTE.findIndex(s => s.id === feld) + 1;
+
   return `
     <div class="karte">
       <div class="karte__kopf">
         <div>
-          <span class="hut">Eventlicht</span>
-          <h1 class="karte__titel">Wie groß ist der Raum?</h1>
+          <span class="hut">${hut}</span>
+          <h1 class="karte__titel">${frage}</h1>
         </div>
       </div>
 
       <div class="groessen">
-        ${LICHT.map(l => `
-          <button class="groesse" type="button" data-licht="${l.id}"
-                  aria-pressed="${zustand.licht === l.id}">
+        ${liste.map(l => `
+          <button class="groesse" type="button" data-stufe="${feld}" data-id="${l.id}"
+                  aria-pressed="${zustand[feld] === l.id}">
             <b>${l.name}</b>
             <small>${l.gaeste.replace(' Gäste','')}</small>
             <span>${l.inklusive ? 'inklusive' : euro(l.preis)}</span>
           </button>`).join('')}
       </div>
 
-      <button class="mehr" type="button" data-details="licht" aria-expanded="${zustand.details.licht}">
+      <button class="mehr" type="button" data-details="${feld}" aria-expanded="${offen}">
         <span>Was ist dabei?</span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
 
-      ${zustand.details.licht ? `
+      ${offen ? `
         <div class="mehr__inhalt">
           <p class="karte__text">${gew.text}</p>
           <dl class="daten">
@@ -197,8 +214,8 @@ function wahlLicht() {
         </div>` : ''}
 
       <div class="karte__fuss karte__fuss--reihe">
-        <button class="knopf knopf--leer" type="button" data-zurueck="0">Zurück</button>
-        <button class="knopf knopf--voll" type="button" data-weiter="2">Weiter</button>
+        <button class="knopf knopf--leer" type="button" data-zurueck="${zurueck}">Zurück</button>
+        <button class="knopf knopf--voll" type="button" data-weiter="${weiter}">Weiter</button>
       </div>
     </div>`;
 }
@@ -228,7 +245,7 @@ function wahlAnfrage() {
       </div>
 
       <div class="karte__fuss karte__fuss--reihe">
-        <button class="knopf knopf--leer" type="button" data-zurueck="1">Zurück</button>
+        <button class="knopf knopf--leer" type="button" data-zurueck="${SCHRITTE.length - 2}">Zurück</button>
         <button class="knopf knopf--voll" type="button" id="senden">Anfrage schicken</button>
       </div>
       <p class="fein">Öffnet dein Mailprogramm mit der fertigen Zusammenstellung. Es wird nichts automatisch verschickt.</p>
@@ -243,8 +260,16 @@ function szeneAktualisieren(sofort = false) {
     szene.setzeKamera(szene.rahmenFuerDj(zustand.djIndex), sofort);
     return;
   }
-  const li = LICHT.find(l => l.id === zustand.licht);
-  szene.setzeKamera(li ? szene.rahmen(li.sicht) : szene.rahmen(560, 0, -180, 0.52, 540), sofort);
+  const st = STAGE.find(l => l.id === zustand.stage);
+  const sk = SKINS.find(l => l.id === zustand.skin);
+  /* Deko baut nach oben — dafür fährt die Kamera etwas weiter heraus. */
+  const sicht = st ? st.sicht + (sk ? sk.hoehe : 0) : 560;
+  szene.setzeKamera(szene.rahmen(sicht, 0, -194, 0.52, st ? 700 : 540), sofort);
+}
+
+function rigNeu() {
+  szene.baueRig(STAGE.find(l => l.id === zustand.stage),
+                SKINS.find(l => l.id === zustand.skin));
 }
 
 /* ------------------------------------------------------------------
@@ -275,7 +300,8 @@ function waehleDj(id) {
   zustand.dj = id;
   zustand.djIndex = i;
   zustand.karussell = false;
-  if (!zustand.licht) zustand.licht = LICHT[0].id;   /* S ist immer dabei */
+  if (!zustand.stage) zustand.stage = STAGE[0].id;   /* S ist immer dabei */
+  if (!zustand.skin)  zustand.skin  = SKINS[0].id;   /* Pur ebenso */
 
   /* Den Gewählten in die Mitte setzen und die Kamera im selben Bild
      mitziehen — sichtbar passiert dabei nichts. Danach fährt die
@@ -283,7 +309,7 @@ function waehleDj(id) {
   szene.waehleDj(i);
   szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
 
-  szene.baueRig(LICHT.find(l => l.id === zustand.licht));
+  rigNeu();
   Klang.zeigen(DJS[i], true);
 
   zustand.schritt = 1;
@@ -291,11 +317,15 @@ function waehleDj(id) {
 }
 
 /* Zurück zur DJ-Auswahl — die bereits gewählte Größe bleibt erhalten. */
+/* Zurück zur DJ-Auswahl: die Bühne wird um den DJ herum abgebaut,
+   die Kamera fährt wieder heran. Der DJ bleibt dabei stehen — die
+   anderen beiden werden links und rechts neben ihm neu aufgebaut,
+   damit nichts seitlich wegschwenkt. */
 function karussellOeffnen() {
-  if (zustand.karussell) { zeichnen(); return; }   /* steht schon offen */
+  if (zustand.karussell) { zeichnen(); return; }
   zustand.karussell = true;
-  szene.baueDjs(DJS);
-  szene.lVorne.innerHTML = '';
+  szene.rigAbbauen();
+  szene.baueDjs(DJS, zustand.djIndex);
   punkteZeichnen();
   zeichnen();
 }
@@ -306,22 +336,22 @@ function schrittSetzen(n) {
   else zeichnen();
 }
 
-/* Es gibt kein "kein Licht" — S ist die Grundausstattung,
-   M und L sind Ausbaustufen davon. */
-function waehleLicht(id) {
-  if (zustand.licht === id) return;
-  zustand.licht = id;
-  szene.baueRig(LICHT.find(l => l.id === id));
+/* Es gibt kein "gar nichts" — S bzw. Pur sind die Grundausstattung,
+   alles andere baut darauf auf. */
+function waehleStufe(feld, id) {
+  if (zustand[feld] === id) return;
+  zustand[feld] = id;
+  rigNeu();
   zeichnen();
 }
 
 function entferne(art) {
-  if (art === 'licht') {
-    waehleLicht(LICHT[0].id);          /* zurück auf die Grundausstattung */
-  }
+  if (art === 'stage') waehleStufe('stage', STAGE[0].id);
+  if (art === 'skin')  waehleStufe('skin',  SKINS[0].id);
   if (art === 'dj') {
     zustand.dj = null;
-    zustand.licht = null;
+    zustand.stage = null;
+    zustand.skin = null;
     schrittSetzen(0);
   }
 }
@@ -378,11 +408,11 @@ function anfrageSenden() {
    Ereignisse
    ------------------------------------------------------------------ */
 document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-dj],[data-licht],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],[data-details],#djMehr,#senden');
+  const t = e.target.closest('[data-dj],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],[data-details],[data-stufe],#djMehr,#senden');
   if (!t) return;
 
   if (t.dataset.dj)            waehleDj(t.dataset.dj);
-  else if (t.dataset.licht)    waehleLicht(t.dataset.licht);
+  else if (t.dataset.stufe)    waehleStufe(t.dataset.stufe, t.dataset.id);
   else if (t.dataset.weiter)   schrittSetzen(+t.dataset.weiter);
   else if (t.dataset.zurueck)  schrittSetzen(+t.dataset.zurueck);
   else if (t.dataset.schritt)  schrittSetzen(+t.dataset.schritt);

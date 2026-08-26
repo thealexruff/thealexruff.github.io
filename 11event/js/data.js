@@ -80,28 +80,57 @@ const DJS = [
   }
 ];
 
-/* ---------- 2. Eventlicht ---------- */
-const LICHT = [
+/* ---------- 2. Stage ----------
+   rig.segmente steuert die Breite der Traverse (ein Stück = 45).
+   Die Zahlen sind so gewählt, dass die kleinere Größe immer die Mitte
+   der größeren ist — nur so kann beim Wechsel stehenbleiben, was schon
+   da ist, statt alles neu aufzubauen.                              */
+const STAGE = [
   {
-    id: 'licht-S', name: 'S', zusatz: 'Der Raum', gaeste: 'bis 60 Gäste', preis: 0, inklusive: true,
+    id: 'stage-S', name: 'S', zusatz: 'Der Raum', gaeste: 'bis 60 Gäste',
+    preis: 0, inklusive: true,
     text: 'Eine kurze Traverse über der Tanzfläche. Setzt Akzente, ohne den Raum zu übernehmen.',
-    rig: { trav: 200, koepfe: 4, sunbars: 2, tubes: 0, tuerme: false, laser: false, leute: 5 },
+    rig: { segmente: 8, koepfe: 4, sunbars: 2, tubes: 0, tuerme: false, laser: false, leute: 5 },
     sicht: 730,
     daten: [['Fläche','bis 100 m²'],['Traverse','4 m'],['Movingheads','4'],['Sunbars','2'],['Crew','1 Person']]
   },
   {
-    id: 'licht-M', name: 'M', zusatz: 'Der Saal', gaeste: '60 bis 150 Gäste', preis: 500,
+    id: 'stage-M', name: 'M', zusatz: 'Der Saal', gaeste: '60 bis 150 Gäste', preis: 500,
     text: 'Durchgehende Traverse über die ganze Fläche, Wash und Beam getrennt gefahren. Passt auf die meisten Säle und Scheunen.',
-    rig: { trav: 400, koepfe: 8, sunbars: 4, tubes: 4, tuerme: false, laser: false, leute: 11 },
+    rig: { segmente: 16, koepfe: 8, sunbars: 4, tubes: 4, tuerme: false, laser: false, leute: 11 },
     sicht: 900,
     daten: [['Fläche','100–300 m²'],['Traverse','8 m'],['Movingheads','8'],['Sunbars','4'],['LED-Schläuche','4'],['Crew','2 Personen']]
   },
   {
-    id: 'licht-L', name: 'L', zusatz: 'Die Halle', gaeste: 'ab 150 Gäste', preis: 750,
+    id: 'stage-L', name: 'L', zusatz: 'Die Halle', gaeste: 'ab 150 Gäste', preis: 750,
     text: 'Vollausbau mit Seitentürmen und Laser, live gefahren auf GrandMA3. Für Hallen, Festzelte und große Flächen.',
-    rig: { trav: 560, koepfe: 12, sunbars: 6, tubes: 6, tuerme: true, laser: true, leute: 18 },
+    rig: { segmente: 24, koepfe: 12, sunbars: 6, tubes: 6, tuerme: true, laser: true, leute: 18 },
     sicht: 1200,
     daten: [['Fläche','ab 300 m²'],['Traverse','12 m + 2 Türme'],['Movingheads','12'],['Sunbars','6'],['LED-Schläuche','6'],['Laser','inklusive'],['Crew','2 Personen']]
+  }
+];
+
+/* ---------- 3. Skin ----------
+   Deko, die sich um das Rig legt. hoehe = wie viel weiter die Kamera
+   herausfahren muss, damit die Aufbauten ins Bild passen.          */
+const SKINS = [
+  {
+    id: 'skin-pur', name: 'Pur', zusatz: 'Nur Technik', gaeste: 'immer dabei',
+    preis: 0, inklusive: true, hoehe: 0,
+    text: 'Traverse, Licht, sonst nichts. Die ehrliche Variante — passt in Räume, die schon von sich aus etwas hermachen.',
+    daten: [['Aufbau','wie gehabt'],['Zusatzzeit','—']]
+  },
+  {
+    id: 'skin-bluete', name: 'Blüten', zusatz: 'Hochzeit & Sommerfest', gaeste: 'warm, weich',
+    preis: 350, hoehe: 60,
+    text: 'Girlanden über die ganze Traverse, zwei Blumensäulen neben dem Pult und ein grüner Bogen dahinter. Dazu warmes Licht statt kaltem Beam.',
+    daten: [['Girlanden','über die volle Breite'],['Säulen','2 Stück'],['Bogen','hinter dem Pult'],['Blumen','saisonal, regional'],['Zusatzzeit','2 Stunden Aufbau']]
+  },
+  {
+    id: 'skin-mainstage', name: 'Mainstage', zusatz: 'Festival im Kleinen', gaeste: 'laut, groß',
+    preis: 600, hoehe: 190,
+    text: 'Winkelportale an beiden Seiten, eine gestufte Panelwand hinter dem DJ, Finnen auf der Traverse und eine Krone darüber. Macht aus einer Traverse eine Bühne.',
+    daten: [['Portale','2 Seitenwinkel'],['Panelwand','5 Felder'],['Finnen','auf der Traverse'],['Krone','über der Mitte'],['Zusatzzeit','3 Stunden Aufbau']]
   }
 ];
 
