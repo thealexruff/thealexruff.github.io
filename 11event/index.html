@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://w.soundcloud.com/player/api.js"></script>
 </head>
 <body>
 
@@ -22,10 +23,24 @@
     <ol class="schritte" id="schritte" aria-label="Schritte"></ol>
   </header>
 
-  <main class="buehne" id="buehne">
+  <!-- Die Fläche liegt fest im Hintergrund, das Blatt scrollt darüber. -->
+  <div class="buehne" id="buehne">
     <svg id="szene" class="szene" xmlns="http://www.w3.org/2000/svg"
          viewBox="-320 -440 640 540" preserveAspectRatio="xMidYMid meet"
          role="img" aria-label="Visuelle Vorschau deiner Auswahl"></svg>
+
+    <button class="ton" id="ton" type="button" aria-pressed="false" aria-label="Ton ausschalten">
+      <svg class="ton__an" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+        <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg class="ton__aus" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+        <path d="M17 9.5l5 5M22 9.5l-5 5"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
 
     <div class="szene__nav" id="szeneNav" hidden>
       <button class="pfeil" id="pfeilLinks" type="button" aria-label="Vorheriger DJ">
@@ -38,9 +53,21 @@
     </div>
 
     <p class="wischhinweis" id="wischhinweis" hidden>Wischen zum Durchsehen</p>
-  </main>
+  </div>
+  <div class="buehne__platz" aria-hidden="true"></div>
 
-  <section class="wahl" id="wahl" aria-live="polite"></section>
+  <section class="blatt">
+    <span class="blatt__griff" aria-hidden="true"></span>
+
+    <!-- Bleibt dauerhaft im Dokument, damit die Musik beim
+         Schrittwechsel nicht abreißt. Nie neu rendern. -->
+    <div class="klang" id="klang" data-sichtbar="false">
+      <iframe id="scFrame" title="Set anhören" allow="autoplay"
+              frameborder="0" scrolling="no"></iframe>
+    </div>
+
+    <div class="wahl" id="wahl" aria-live="polite"></div>
+  </section>
 
   <aside class="korb" id="korb" data-offen="false">
     <button class="korb__leiste" id="korbLeiste" type="button" aria-expanded="false" aria-controls="korbInhalt">
@@ -54,7 +81,7 @@
     <div class="korb__inhalt" id="korbInhalt">
       <h2 class="korb__titel">Dein Abend</h2>
       <ul class="posten" id="posten"></ul>
-      <p class="korb__leer" id="korbLeer">Wähle links einen DJ — der Rest baut sich drumherum auf.</p>
+      <p class="korb__leer" id="korbLeer">Wähle einen DJ — das Licht baut sich drumherum auf.</p>
       <div class="korb__fuss">
         <div class="korb__gesamt"><span>Gesamt</span><b id="korbGesamt">0 €</b></div>
         <p class="fein">Alle Preise inkl. Anfahrt im Umkreis von 50 km. Unverbindlich.</p>
@@ -69,6 +96,7 @@
 
 <script src="js/data.js"></script>
 <script src="js/scene.js"></script>
+<script src="js/klang.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

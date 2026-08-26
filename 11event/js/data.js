@@ -5,27 +5,38 @@
 
 const KONTAKT_MAIL = 'info@11event.de';
 
+/* ------------------------------------------------------------------
+   PLATZHALTER — hier die echten SoundCloud-Links der DJs eintragen.
+   Aktuell zeigen alle drei auf denselben Beispiel-Track aus der
+   SoundCloud-Doku, damit der Player überhaupt etwas abspielt.
+   Format: die normale Track- oder Set-Adresse von soundcloud.com.
+   ------------------------------------------------------------------ */
+const SET_PLATZHALTER = 'https://soundcloud.com/forss/flickermood';
+
 /* ---------- 1. DJs ----------
    look:  haut, haar, shirt, hose, schuh, akzent
    typ:   'kurz' | 'lang' | 'muetze'   (Kopf-Variante)
    pose:  'hoch' | 'pult' | 'mikro'    (Arm-Variante)          */
 const DJS = [
   {
-    id: 'dj-marco', name: 'Marco K.', preis: 450,
+    id: 'dj-marco',
+    set: SET_PLATZHALTER, name: 'Marco K.', preis: 450,
     stil: 'House · Disco · Charts',
     text: 'Spielt seit acht Jahren Feiern und hat ein Gespür für die Uhrzeit. Holt die Eltern auf die Tanzfläche, bevor sie gehen wollen.',
     typ: 'kurz', pose: 'hoch', bart: true,
     look: { haut:'#E5A97C', haar:'#2A1E16', shirt:'#2645C9', hose:'#171A22', schuh:'#0D0F14', akzent:'#F9A163' }
   },
   {
-    id: 'dj-nele', name: 'Nele B.', preis: 520,
+    id: 'dj-nele',
+    set: SET_PLATZHALTER, name: 'Nele B.', preis: 520,
     stil: '90er bis Charts · Moderation',
     text: 'Breite Bandbreite, sauber gemixt, kein Bruch zwischen den Jahrzehnten. Übernimmt auf Wunsch auch die Ansagen des Abends.',
     typ: 'lang', pose: 'monitor', bart: false,
     look: { haut:'#F0C09B', haar:'#8A4B24', shirt:'#F9A163', hose:'#20242F', schuh:'#0D0F14', akzent:'#2645C9' }
   },
   {
-    id: 'dj-tobi', name: 'Tobi R.', preis: 600,
+    id: 'dj-tobi',
+    set: SET_PLATZHALTER, name: 'Tobi R.', preis: 600,
     stil: 'Techno · House',
     text: 'Für die späte Stunde. Spielt eng am Licht — läuft mit unserem Rig auf einer Wellenlänge, weil wir oft zusammen arbeiten.',
     typ: 'muetze', pose: 'pult', bart: false, brille: true,
@@ -36,7 +47,7 @@ const DJS = [
 /* ---------- 2. Eventlicht ---------- */
 const LICHT = [
   {
-    id: 'licht-S', name: 'S', zusatz: 'Der Raum', gaeste: 'bis 60 Gäste', preis: 250,
+    id: 'licht-S', name: 'S', zusatz: 'Der Raum', gaeste: 'bis 60 Gäste', preis: 0, inklusive: true,
     text: 'Eine kurze Traverse über der Tanzfläche. Setzt Akzente, ohne den Raum zu übernehmen.',
     rig: { trav: 200, koepfe: 4, sunbars: 2, tubes: 0, tuerme: false, laser: false, leute: 5 },
     sicht: 730,

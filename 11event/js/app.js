@@ -9,6 +9,9 @@ const euro = (n) => new Intl.NumberFormat('de-DE', {
   style: 'currency', currency: 'EUR', maximumFractionDigits: 0
 }).format(n);
 
+/* Was nichts kostet, steht auch nicht als "0 €" da. */
+const preisText = (n) => (n === 0 ? 'inklusive' : euro(n));
+
 const SCHRITTE = [
   { id: 'dj',      label: 'DJ' },
   { id: 'licht',   label: 'Licht' },
@@ -20,7 +23,8 @@ const zustand = {
   karussell: true,     /* steht die DJ-Auswahl gerade offen? */
   djIndex: 0,          /* welcher DJ gerade in der Mitte steht */
   dj: null,            /* gewählte id */
-  licht: null,
+  licht: null,         /* nie leer, sobald ein DJ steht — S ist immer dabei */
+  details: { dj: false, licht: false },   /* aufgeklappte Detailblöcke */
   formular: { name: '', mail: '', datum: '', ort: '', gaeste: '', text: '' }
 };
 
@@ -34,7 +38,12 @@ function posten() {
   const dj = DJS.find(d => d.id === zustand.dj);
   if (dj) p.push({ art: 'dj', titel: dj.name, unter: `DJ · ${dj.stil}`, preis: dj.preis });
   const li = LICHT.find(l => l.id === zustand.licht);
-  if (li) p.push({ art: 'licht', titel: `Eventlicht ${li.name}`, unter: `${li.zusatz} · ${li.gaeste}`, preis: li.preis });
+  if (li) p.push({
+    art: 'licht', titel: `Eventlicht ${li.name}`,
+    unter: `${li.zusatz} · ${li.gaeste}`,
+    preis: li.preis,
+    fest: !!li.inklusive          /* S lässt sich nicht entfernen */
+  });
   return p;
 }
 
@@ -60,10 +69,12 @@ function korbZeichnen() {
         <b>${x.titel}</b>
         <small>${x.unter}</small>
       </span>
-      <span class="posten__preis">${euro(x.preis)}</span>
-      <button class="posten__weg" type="button" data-weg="${x.art}" aria-label="${x.titel} entfernen">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      <span class="posten__preis ${x.preis === 0 ? 'posten__preis--frei' : ''}">${preisText(x.preis)}</span>
+      ${x.fest
+        ? '<span class="posten__weg posten__weg--leer" aria-hidden="true"></span>'
+        : `<button class="posten__weg" type="button" data-weg="${x.art}" aria-label="${x.titel} entfernen">
+             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+           </button>`}
     </li>`).join('');
 }
 
@@ -102,6 +113,7 @@ function wahlZeichnen() {
 
   $('#szeneNav').hidden      = !zustand.karussell;
   $('#wischhinweis').hidden  = !zustand.karussell;
+  $('#klang').dataset.sichtbar = String(zustand.karussell);
 }
 
 function wahlDj() {
@@ -117,17 +129,22 @@ function wahlDj() {
         </div>
         <div class="preis">${euro(dj.preis)}</div>
       </div>
-      <p class="karte__text">${dj.text}</p>
       <div class="karte__fuss">
         <button class="knopf knopf--voll" type="button" data-dj="${dj.id}">
           ${gewaehlt ? `Weiter mit ${dj.name}` : `${dj.name} auswählen`}
         </button>
       </div>
+
+      <button class="mehr" type="button" data-details="dj" aria-expanded="${zustand.details.dj}">
+        <span>Über ${dj.name}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      ${zustand.details.dj ? `<div class="mehr__inhalt"><p class="karte__text">${dj.text}</p></div>` : ''}
     </div>`;
 }
 
 function wahlLicht() {
-  const gew = LICHT.find(l => l.id === zustand.licht);
+  const gew = LICHT.find(l => l.id === zustand.licht) || LICHT[0];
   return `
     <div class="karte">
       <div class="karte__kopf">
@@ -143,24 +160,27 @@ function wahlLicht() {
                   aria-pressed="${zustand.licht === l.id}">
             <b>${l.name}</b>
             <small>${l.gaeste.replace(' Gäste','')}</small>
-            <span>${euro(l.preis)}</span>
+            <span>${l.inklusive ? 'inklusive' : euro(l.preis)}</span>
           </button>`).join('')}
       </div>
 
-      ${gew ? `
-        <p class="karte__text">${gew.text}</p>
-        <dl class="daten">
-          ${gew.daten.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
-        </dl>` : `
-        <p class="karte__text karte__text--leise">
-          Tippe eine Größe an — das Rig baut sich um deinen DJ herum auf.
-        </p>`}
+      <button class="mehr" type="button" data-details="licht" aria-expanded="${zustand.details.licht}">
+        <span>Was ist dabei?</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      ${zustand.details.licht ? `
+        <div class="mehr__inhalt">
+          <p class="karte__text">${gew.text}</p>
+          <dl class="daten">
+            ${gew.daten.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+          </dl>
+        </div>` : ''}
 
       <div class="karte__fuss karte__fuss--reihe">
         <button class="knopf knopf--leer" type="button" data-zurueck="0">Zurück</button>
-        <button class="knopf knopf--voll" type="button" data-weiter="2" ${gew ? '' : 'disabled'}>Weiter</button>
+        <button class="knopf knopf--voll" type="button" data-weiter="2">Weiter</button>
       </div>
-      <button class="textlink" type="button" data-weiter="2">Ohne Licht weiter</button>
     </div>`;
 }
 
@@ -219,10 +239,14 @@ function zeichnen(sofort = false) {
 }
 
 function zuDj(i) {
-  zustand.djIndex = Math.max(0, Math.min(DJS.length - 1, i));
+  const neu = Math.max(0, Math.min(DJS.length - 1, i));
+  const wechsel = neu !== zustand.djIndex;
+  zustand.djIndex = neu;
   punkteZeichnen();
   wahlZeichnen();
   szeneAktualisieren();
+  /* Beim Blättern den Track mitziehen. Lief schon etwas, läuft es weiter. */
+  if (wechsel) Klang.zeigen(DJS[neu], Klang.spieltGerade());
 }
 
 /* DJ festlegen: Karussell klappt zusammen, das Rig baut sich
@@ -232,8 +256,13 @@ function waehleDj(id) {
   zustand.dj = id;
   zustand.djIndex = i;
   zustand.karussell = false;
+  if (!zustand.licht) zustand.licht = LICHT[0].id;   /* S ist immer dabei */
+
   szene.waehleDj(i);
-  szene.baueRig(LICHT.find(l => l.id === zustand.licht) || null);
+  szene.baueRig(LICHT.find(l => l.id === zustand.licht));
+
+  Klang.zeigen(DJS[i], true);                        /* jetzt läuft die Musik */
+
   zustand.schritt = 1;
   zeichnen();
 }
@@ -254,17 +283,18 @@ function schrittSetzen(n) {
   else zeichnen();
 }
 
+/* Es gibt kein "kein Licht" — S ist die Grundausstattung,
+   M und L sind Ausbaustufen davon. */
 function waehleLicht(id) {
-  zustand.licht = (zustand.licht === id) ? null : id;
-  szene.baueRig(LICHT.find(l => l.id === zustand.licht) || null);
+  if (zustand.licht === id) return;
+  zustand.licht = id;
+  szene.baueRig(LICHT.find(l => l.id === id));
   zeichnen();
 }
 
 function entferne(art) {
   if (art === 'licht') {
-    zustand.licht = null;
-    szene.baueRig(null);
-    zeichnen();
+    waehleLicht(LICHT[0].id);          /* zurück auf die Grundausstattung */
   }
   if (art === 'dj') {
     zustand.dj = null;
@@ -325,7 +355,7 @@ function anfrageSenden() {
    Ereignisse
    ------------------------------------------------------------------ */
 document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-dj],[data-licht],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],#senden');
+  const t = e.target.closest('[data-dj],[data-licht],[data-weiter],[data-zurueck],[data-schritt],[data-punkt],[data-weg],[data-details],#senden');
   if (!t) return;
 
   if (t.dataset.dj)            waehleDj(t.dataset.dj);
@@ -334,6 +364,7 @@ document.addEventListener('click', (e) => {
   else if (t.dataset.zurueck)  schrittSetzen(+t.dataset.zurueck);
   else if (t.dataset.schritt)  schrittSetzen(+t.dataset.schritt);
   else if (t.dataset.punkt)    zuDj(+t.dataset.punkt);
+  else if (t.dataset.details)  { const k = t.dataset.details; zustand.details[k] = !zustand.details[k]; wahlZeichnen(); }
   else if (t.dataset.weg)      entferne(t.dataset.weg);
   else if (t.id === 'senden')  anfrageSenden();
 });
@@ -342,6 +373,21 @@ document.addEventListener('input', (e) => {
   const m = { 'f-name':'name', 'f-mail':'mail', 'f-datum':'datum',
               'f-ort':'ort', 'f-gaeste':'gaeste', 'f-text':'text' };
   if (m[e.target.id]) zustand.formular[m[e.target.id]] = e.target.value;
+});
+
+/* ---------- Ton ---------- */
+function tonZeichnen() {
+  const k = $('#ton');
+  const aus = Klang.istStumm();
+  k.dataset.aus = String(aus);
+  k.dataset.laeuft = String(Klang.spieltGerade());
+  k.setAttribute('aria-pressed', String(aus));
+  k.setAttribute('aria-label', aus ? 'Ton einschalten' : 'Ton ausschalten');
+}
+Klang.beiAenderung(tonZeichnen);
+$('#ton').addEventListener('click', () => {
+  Klang.stummSchalten(!Klang.istStumm());
+  tonZeichnen();
 });
 
 $('#pfeilLinks').addEventListener('click',  () => zuDj(zustand.djIndex - 1));
@@ -406,3 +452,5 @@ window.addEventListener('resize', () => szeneAktualisieren(true));
 szene.baueDjs(DJS);
 punkteZeichnen();
 zeichnen(true);
+Klang.zeigen(DJS[0], false);   /* vorladen, aber noch still */
+tonZeichnen();
