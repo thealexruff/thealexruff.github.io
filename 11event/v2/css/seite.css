@@ -1,0 +1,260 @@
+/* ==================================================================
+   SEITE — Landingpages (Party, Hochzeit, Partner).
+   Setzt auf basis.css auf.
+   ================================================================== */
+
+body{overflow-x:hidden}
+
+/* ---------- Kopf ---------- */
+.kopf{
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--linie);
+  background:color-mix(in srgb,var(--bg) 72%,transparent);
+  backdrop-filter:blur(14px) saturate(1.4);
+}
+.kopf__inner{
+  max-width:1180px;margin:0 auto;
+  display:flex;align-items:center;gap:18px;
+  padding:12px 20px;
+}
+.kopf__nav{display:none;gap:26px;margin-left:14px}
+.kopf__nav a{
+  font-size:14px;font-weight:500;color:var(--leise);
+  text-decoration:none;transition:color .2s ease;
+}
+.kopf__nav a:hover{color:var(--ink)}
+.kopf__rechts{display:flex;align-items:center;gap:10px;margin-left:auto}
+.kopf__welt{display:none}
+
+.menue{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;flex:none;
+  border:1px solid var(--linie);border-radius:12px;
+  background:none;cursor:pointer;
+}
+.menue span{position:relative;display:block;width:17px;height:13px}
+.menue span i{
+  position:absolute;left:0;height:2px;width:17px;border-radius:2px;
+  background:currentColor;transition:transform .25s var(--weich),opacity .2s ease;
+}
+.menue span i:nth-child(1){top:0}
+.menue span i:nth-child(2){top:5.5px}
+.menue span i:nth-child(3){top:11px}
+.menue[aria-expanded="true"] i:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.menue[aria-expanded="true"] i:nth-child(2){opacity:0}
+.menue[aria-expanded="true"] i:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+.schublade{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .3s var(--weich);
+  border-top:1px solid transparent;
+}
+.schublade>div{overflow:hidden}
+.schublade[data-offen="true"]{grid-template-rows:1fr;border-top-color:var(--linie)}
+.schublade__inner{display:flex;flex-direction:column;gap:2px;padding:10px 20px 16px}
+.schublade a{
+  padding:11px 0;font-size:15px;font-weight:500;
+  color:var(--leise);text-decoration:none;
+}
+.schublade a:hover{color:var(--ink)}
+
+@media (min-width:900px){
+  .kopf__nav{display:flex}
+  .kopf__welt{display:inline-flex}
+  .menue{display:none}
+  .schublade{display:none}
+  .kopf__inner{padding:14px 28px}
+}
+
+/* ---------- Abschnitte ---------- */
+.bahn{position:relative;padding:64px 20px}
+.bahn__inner{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+.bahn--linie{border-top:1px solid var(--linie)}
+.bahn--grund{background:var(--grund)}
+
+.hut{
+  display:block;font-size:11.5px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--akzent);margin-bottom:12px;
+}
+.bahn h2{font-size:clamp(26px,5.2vw,40px)}
+.bahn__text{margin-top:14px;max-width:52ch;color:var(--leise);font-size:16px}
+
+/* ---------- Held ---------- */
+.held{
+  position:relative;overflow:hidden;
+  padding:74px 20px 68px;
+  text-align:center;
+}
+.held__inner{position:relative;z-index:1;max-width:920px;margin:0 auto}
+.held h1{
+  font-size:clamp(34px,8.6vw,72px);
+  letter-spacing:-.035em;margin-top:22px;
+}
+.held__text{
+  margin:22px auto 0;max-width:60ch;
+  font-size:clamp(15px,3.6vw,18px);color:var(--leise);
+}
+.held__knoepfe{
+  margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+}
+.held__zahlen{
+  margin:52px auto 0;max-width:760px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+}
+.held__zahlen div{
+  border:1px solid var(--linie);border-radius:var(--r-karte);
+  background:color-mix(in srgb,var(--flaeche) 60%,transparent);
+  padding:16px 10px;
+}
+.held__zahlen b{
+  display:block;font-family:var(--display);font-size:clamp(18px,4.4vw,26px);font-weight:700;
+}
+.held__zahlen span{display:block;margin-top:4px;font-size:11.5px;color:var(--schwach);line-height:1.35}
+
+/* ---------- Kartenraster ---------- */
+.raster{display:grid;gap:16px;margin-top:34px}
+@media (min-width:700px){ .raster--3{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:640px){ .raster--2{grid-template-columns:repeat(2,1fr)} }
+
+.karte{
+  position:relative;
+  border:1px solid var(--linie);border-radius:var(--r-gross);
+  background:var(--flaeche);
+  padding:26px 22px;
+  transition:border-color .25s ease,transform .25s var(--weich);
+}
+@media (hover:hover){ .karte:hover{border-color:var(--linie-stark);transform:translateY(-3px)} }
+.karte h3{font-size:19px;margin-bottom:8px}
+.karte p{color:var(--leise);font-size:14.5px}
+.karte__nr{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;margin-bottom:16px;
+  border-radius:12px;font-family:var(--display);font-weight:700;font-size:15px;
+  background:linear-gradient(140deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+  box-shadow:0 8px 24px -8px var(--glut);
+}
+
+/* ---------- Vorschau-Bühne ---------- */
+.vorschau{
+  position:relative;margin-top:34px;
+  border:1px solid var(--linie);border-radius:var(--r-gross);
+  overflow:hidden;background:#07070C;
+  aspect-ratio:4/3;max-height:520px;
+}
+.vorschau svg{display:block;width:100%;height:100%}
+.vorschau__band{
+  position:absolute;left:0;right:0;bottom:0;
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  padding:16px 18px;
+  background:linear-gradient(to top,rgba(7,7,12,.92),transparent);
+}
+.vorschau__band p{flex:1;min-width:190px;font-size:13.5px;color:#A6A2B8}
+
+/* ---------- Paket-Kacheln ---------- */
+.paket{display:flex;flex-direction:column}
+.paket__preis{
+  font-family:var(--display);font-size:30px;font-weight:700;
+  margin:2px 0 2px;
+}
+.paket__preis small{font-size:14px;font-weight:500;color:var(--leise)}
+.paket ul{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.paket li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink)}
+.paket li::before{
+  content:'';flex:none;width:6px;height:6px;margin-top:7px;border-radius:50%;
+  background:linear-gradient(140deg,var(--akzent),var(--cyan));
+}
+body[data-welt="hochzeit"] .paket li::before{background:linear-gradient(140deg,var(--akzent),var(--akzent-2))}
+.paket--hebt{border-color:color-mix(in srgb,var(--akzent) 55%,transparent)}
+.paket--hebt::after{
+  content:'Beliebt';position:absolute;top:-11px;right:20px;
+  padding:4px 12px;border-radius:var(--r-knopf);
+  font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));color:var(--auf-akzent);
+}
+
+/* ---------- Personen ---------- */
+.person{display:flex;flex-direction:column}
+.person__kopf{display:flex;align-items:center;gap:14px}
+.person__zeichen{
+  width:54px;height:54px;flex:none;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:15px;color:#fff;
+  background:linear-gradient(140deg,var(--magenta),var(--violet));
+}
+.person__zeichen--foto{background:linear-gradient(140deg,var(--amber),var(--magenta))}
+.person__zeichen--film{background:linear-gradient(140deg,var(--cyan),var(--violet))}
+body[data-welt="hochzeit"] .person__zeichen{background:linear-gradient(140deg,var(--sage,#8A9C80),var(--akzent-2))}
+.person__name{display:block;font-family:var(--display);font-size:16.5px;font-weight:600;line-height:1.25}
+.person__rolle{display:block;margin-top:2px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--leise)}
+.person p{margin-top:14px;flex:1}
+.person__fuss{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--linie);
+}
+.person__preis{font-family:var(--display);font-size:18px;font-weight:700}
+.person__preis small{font-size:12px;font-weight:400;color:var(--leise)}
+
+/* ---------- Filter ---------- */
+.filter{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+  margin:0 auto;width:fit-content;
+  border:1px solid var(--linie);border-radius:var(--r-knopf);
+  background:var(--flaeche);padding:6px;
+}
+.filter button{
+  border:0;background:none;cursor:pointer;
+  padding:9px 16px;border-radius:var(--r-knopf);
+  font-size:13.5px;font-weight:600;color:var(--leise);
+  transition:background .2s ease,color .2s ease;
+}
+.filter button[aria-pressed="true"]{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+}
+
+/* ---------- Ruf ---------- */
+.ruf{
+  position:relative;overflow:hidden;
+  border:1px solid var(--linie);border-radius:var(--r-gross);
+  background:var(--flaeche);
+  padding:44px 24px;text-align:center;
+}
+.ruf h2{font-size:clamp(24px,5vw,36px)}
+.ruf p{margin:14px auto 0;max-width:46ch;color:var(--leise)}
+.ruf .held__knoepfe{margin-top:26px}
+
+/* ---------- Fuß ---------- */
+.fuss{
+  border-top:1px solid var(--linie);
+  padding:40px 20px 52px;
+  background:var(--grund);
+}
+.fuss__inner{
+  max-width:1180px;margin:0 auto;
+  display:flex;flex-direction:column;gap:26px;
+}
+.fuss__links{display:flex;flex-wrap:wrap;gap:18px}
+.fuss__links a{font-size:14px;color:var(--leise);text-decoration:none}
+.fuss__links a:hover{color:var(--ink)}
+.fuss__recht{font-size:13px;color:var(--leise)}
+.fuss__recht a{color:var(--leise)}
+@media (min-width:820px){
+  .fuss__inner{flex-direction:row;align-items:flex-start;justify-content:space-between}
+}
+
+@media (min-width:640px){ .vorschau{aspect-ratio:16/9} }
+
+@media (min-width:760px){
+  .bahn{padding:82px 28px}
+  .held{padding:100px 28px 88px}
+  .karte{padding:30px 26px}
+}
+
+/* Beim Scrollen einblenden */
+.kommt{opacity:0;transform:translateY(18px)}
+.kommt.da{opacity:1;transform:none;transition:opacity .6s ease,transform .6s var(--weich)}
+@media (prefers-reduced-motion:reduce){
+  .kommt{opacity:1;transform:none}
+  .glut::before,.glut::after{animation:none}
+}

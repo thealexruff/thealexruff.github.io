@@ -1,0 +1,497 @@
+/* ==================================================================
+   11event Konfigurator — mobile first.
+   Farben, Schrift und Knöpfe kommen aus basis.css; hier steht nur,
+   was den Konfigurator ausmacht.
+   ================================================================== */
+
+/* Der Konfigurator erbt Farben und Schrift aus basis.css.
+   Hier stehen nur noch seine eigenen Maße. */
+:root{
+  --korb-leiste:64px;
+  --kopf-h:56px;
+  --flaeche-h:42dvh;          /* wie viel Bild vor dem Blatt zu sehen ist */
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+
+html,body{height:100%}
+/* Kein Scrollen, solange alles ins Bild passt. Sobald ein Aufklapper
+   den Inhalt über den Rand schiebt, setzt app.js data-scroll="true". */
+body{overflow:hidden;overscroll-behavior-y:none}
+body[data-scroll="true"]{overflow-y:auto}
+body{line-height:1.5}
+
+/* ---------- Grundgerüst ---------- */
+/* Die Fläche liegt fest im Hintergrund. Das Blatt mit den Optionen
+   schiebt sich beim Scrollen darüber. */
+.app{
+  min-height:100dvh;
+  padding-top:var(--kopf-h);
+  padding-bottom:calc(var(--korb-leiste) + var(--sicher));
+}
+
+/* ---------- Kopf ---------- */
+.kopf{
+  position:fixed;top:0;left:0;right:0;z-index:6;
+  display:flex;align-items:center;gap:14px;
+  height:var(--kopf-h);padding:0 16px;
+  border-bottom:1px solid var(--linie);
+  background:var(--bg);
+}
+.kopf .marke__bild{width:74px;height:30px}
+.kopf .marke__bild img{width:30px;height:74px}
+
+.schritte{
+  display:flex;align-items:center;gap:2px;
+  list-style:none;margin:0;padding:0;margin-left:auto;
+  overflow-x:auto;scrollbar-width:none;
+}
+.schritte::-webkit-scrollbar{display:none}
+.kopf__raus{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  margin-left:8px;padding:7px 12px;border-radius:var(--r-knopf);
+  border:1px solid var(--linie);background:none;
+  font-size:12.5px;font-weight:600;color:var(--leise);text-decoration:none;
+  transition:color .2s ease,border-color .2s ease;
+}
+.kopf__raus:hover{color:var(--ink);border-color:var(--linie-stark)}
+.kopf__raus svg{width:14px;height:14px}
+@media (max-width:520px){ .kopf__raus span{display:none} }
+.schritt{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:0;padding:6px 8px;border-radius:var(--r-knopf);
+  color:var(--leise);cursor:pointer;
+  transition:color .2s ease,background .2s ease;
+}
+.schritt:disabled{opacity:.4;cursor:default}
+.schritt__nr{
+  display:grid;place-items:center;
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid currentColor;
+  font-size:11px;font-weight:600;flex:none;
+  transition:width .25s var(--weich),background .2s ease,border-color .2s ease;
+}
+/* Auf schmalen Geräten sind sechs Nummernkreise zu viel — dann Punkte. */
+@media (max-width:620px){
+  .schritt{padding:6px 3px}
+  .schritt__nr{
+    width:9px;height:9px;border-width:0;font-size:0;
+    background:currentColor;opacity:.5;
+  }
+  .schritt[aria-current="step"] .schritt__nr{width:22px;border-radius:5px;opacity:1}
+  .schritt[data-fertig="true"] .schritt__nr{opacity:1}
+}
+.schritt__label{font-size:13px;display:none}
+.schritt[aria-current="step"]{color:var(--ink)}
+.schritt[aria-current="step"] .schritt__label{display:inline}
+.schritt[data-fertig="true"] .schritt__nr{
+  background:var(--akzent);border-color:var(--akzent);color:var(--auf-akzent);
+}
+
+/* ---------- Bühne / Canvas ---------- */
+.buehne{
+  position:fixed;
+  top:var(--kopf-h);left:0;right:0;
+  height:var(--flaeche-h);
+  z-index:0;
+  background:
+    radial-gradient(110% 78% at 50% 4%, color-mix(in srgb,var(--violet) 16%, #0B0B12) 0%, #07070C 68%);
+  overflow:hidden;
+}
+.buehne__platz{height:var(--flaeche-h)}
+.szene{
+  position:absolute;inset:0;
+  display:block;width:100%;height:100%;
+  touch-action:pan-y;
+  cursor:grab;
+}
+.szene.greift{cursor:grabbing}
+
+.szene__nav{
+  position:absolute;left:0;right:0;bottom:46px;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  pointer-events:none;
+}
+.szene__nav>*{pointer-events:auto}
+.pfeil{
+  width:40px;height:40px;flex:none;
+  display:grid;place-items:center;
+  border:1px solid var(--linie);border-radius:50%;
+  background:rgba(11,11,14,.7);backdrop-filter:blur(8px);
+  cursor:pointer;transition:opacity .2s ease,border-color .2s ease;
+}
+.pfeil svg{width:20px;height:20px}
+.pfeil:disabled{opacity:.25;cursor:default}
+.punkte{display:flex;gap:8px;align-items:center}
+.punkt{
+  width:8px;height:8px;padding:0;border:0;border-radius:50%;
+  background:#3A3D4A;cursor:pointer;transition:all .25s var(--weich);
+}
+.punkt[aria-current="true"]{background:var(--akzent);width:22px;border-radius:4px}
+
+.wischhinweis{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  margin:0;font-size:12px;color:var(--leise);
+  background:rgba(11,11,14,.6);padding:4px 12px;border-radius:var(--r-knopf);
+  pointer-events:none;
+}
+
+/* Aufbau: --v ist die Verzögerung in Sekunden.
+   Traverse und Lampen fliegen von oben ein, danach gehen die Strahlen
+   einzeln an. Alles zusammen unter anderthalb Sekunden. */
+.teil{transition:transform .5s var(--weich)}
+.einbau{
+  animation:aufbau .42s cubic-bezier(.2,1.2,.4,1) both;
+  animation-delay:calc(var(--v,0) * 1s);
+}
+.raus{animation:abbau .26s ease-in both}
+/* Der Strahl geht kurz nach der Lampe an */
+.strahl{
+  animation:anleuchten .3s ease-out both;
+  animation-delay:calc((var(--v,0) + .18) * 1s);
+}
+@keyframes aufbau{from{opacity:0;transform:translateY(-90px)}to{opacity:1;transform:none}}
+@keyframes abbau{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-28px)}}
+@keyframes anleuchten{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .einbau,.strahl,.raus{animation:none}
+  .teil{transition:none}
+  .klapp{transition:none}
+  *{scroll-behavior:auto}
+}
+
+/* ---------- Ton-Knopf auf der Fläche ---------- */
+.ton{
+  position:absolute;top:14px;right:14px;z-index:3;
+  width:56px;height:56px;padding:0;
+  display:grid;place-items:center;
+  border:1px solid var(--linie);border-radius:50%;
+  background:rgba(11,11,14,.66);backdrop-filter:blur(10px);
+  color:var(--ink);cursor:pointer;
+  transition:transform .14s ease,border-color .2s ease,color .2s ease;
+}
+.ton:active{transform:scale(.94)}
+.ton svg{width:26px;height:26px}
+.ton .ton__aus{display:none}
+.ton[data-aus="true"]{color:var(--leise);border-color:var(--linie)}
+.ton[data-aus="true"] .ton__an{display:none}
+.ton[data-aus="true"] .ton__aus{display:block}
+
+/* Läuft Musik, bekommt der Knopf einen ruhigen Ring in Akzentfarbe */
+.ton[data-aus="false"][data-laeuft="true"]{border-color:var(--akzent);color:var(--akzent)}
+.ton[data-aus="false"][data-laeuft="true"]::after{
+  content:'';position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid var(--akzent);opacity:.5;
+  animation:puls 2.4s ease-out infinite;
+}
+@keyframes puls{
+  0%{transform:scale(.94);opacity:.55}
+  70%{transform:scale(1.14);opacity:0}
+  100%{opacity:0}
+}
+@media (prefers-reduced-motion:reduce){ .ton::after{animation:none} }
+
+/* ---------- Aufklapper ----------
+   0fr → 1fr klappt auf, ohne den Inhalt aus dem Bau zu nehmen.
+   Wichtig für den Player: display:none würde die Musik anhalten. */
+.klapp{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows .32s var(--weich);
+}
+.klapp>*{overflow:hidden;min-height:0}
+.klapp[data-offen="true"]{grid-template-rows:1fr}
+
+/* ---------- SoundCloud-Player ---------- */
+/* Steckt im Aufklapper unter dem DJ und ist zugeklappt nur verdeckt,
+   nicht entfernt — sonst reißt die Musik ab. */
+.klang{margin-top:14px}
+.klang iframe{display:block;width:100%;height:130px;border:0;border-radius:12px}
+
+/* ---------- Mehr-Schalter ---------- */
+.mehr{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:100%;margin-top:11px;padding:9px 0;
+  background:none;border:0;border-top:1px solid var(--linie);
+  font-size:14px;color:var(--leise);cursor:pointer;
+}
+.mehr svg{width:18px;height:18px;transition:transform .25s var(--weich)}
+.mehr[aria-expanded="true"]{color:var(--ink)}
+.mehr[aria-expanded="true"] svg{transform:rotate(180deg)}
+.mehr__inhalt{animation:aufklappen .28s var(--weich) both}
+@keyframes aufklappen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.mehr__inhalt .karte__text{margin-top:0}
+.mehr__inhalt .daten{border-top:0;padding-top:6px}
+
+/* ---------- Auswahlkarte ---------- */
+.blatt{
+  position:relative;z-index:2;
+  margin-top:-26px;
+  border-radius:26px 26px 0 0;
+  background:var(--bg);
+  box-shadow:0 -20px 44px rgba(0,0,0,.6);
+  padding-top:10px;      /* verhindert, dass der Griff seinen Rand
+                            nach außen kollabieren lässt */
+  /* Genau so hoch, dass Kopf + Fläche + Blatt + Korbleiste zusammen
+     eine Bildschirmhöhe ergeben — dann scrollt zugeklappt nichts. */
+  min-height:calc(100dvh - var(--kopf-h) - var(--flaeche-h) + 26px
+                  - var(--korb-leiste) - var(--sicher));
+  padding-bottom:16px;
+}
+.blatt__griff{
+  display:block;width:40px;height:4px;border-radius:2px;
+  background:var(--linie);margin:0 auto 2px;
+}
+.wahl{padding:8px 16px 14px}
+.wahl:empty{display:none}   /* im DJ-Schritt leer — soll dann auch keinen Platz nehmen */
+.karte{
+  background:var(--flaeche);
+  border:1px solid var(--linie);
+  border-radius:var(--r-karte);
+  padding:15px 16px;
+}
+.karte__kopf{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
+.hut{
+  display:block;font-size:11px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--akzent-2);margin-bottom:5px;
+}
+.karte__titel{font-family:var(--display);font-size:25px;line-height:1.1}
+.karte__stil{margin:4px 0 0;font-size:14px;color:var(--leise)}
+.preis{font-family:var(--display);font-size:20px;font-weight:700;white-space:nowrap;flex:none;padding-top:16px}
+.karte__text{margin:12px 0 0;font-size:14.5px;color:var(--leise)}
+.karte__text--leise{font-size:13.5px}
+.karte__fuss{margin-top:13px}
+.karte__fuss--reihe{display:flex;gap:10px}
+/* Im Konfigurator füllen die Knöpfe ihre Zeile */
+.karte__fuss .knopf,.korb__fuss .knopf{width:100%}
+.karte__fuss--reihe .knopf{flex:1;width:auto}
+.karte__fuss--reihe .knopf{flex:1}
+.textlink{
+  display:block;margin:9px auto 0;background:none;border:0;
+  font-size:13px;color:var(--leise);text-decoration:underline;
+  text-underline-offset:3px;cursor:pointer;
+}
+
+/* ---------- Porträt und Links im Aufklapper ---------- */
+.portraet{
+  width:104px;height:104px;flex:none;
+  border-radius:50%;overflow:hidden;
+  background:var(--flaeche-hoch);
+  margin:2px 0 14px;
+}
+.portraet svg,.portraet img{display:block;width:100%;height:100%;object-fit:cover}
+
+#djFakten{grid-template-columns:1fr}
+
+.links{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:14px 0 0;padding:0}
+.link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:var(--r-knopf);
+  border:1px solid var(--linie);background:var(--flaeche-hoch);
+  color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:500;
+  transition:border-color .2s ease,background .2s ease;
+}
+.link svg{width:14px;height:14px;color:var(--leise)}
+@media (hover:hover){ .link:hover{border-color:var(--akzent)} .link:hover svg{color:var(--akzent)} }
+
+/* ---------- Größen S M L ---------- */
+.groessen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
+.groesse{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:10px 6px;border-radius:14px;
+  border:1px solid var(--linie);background:var(--flaeche-hoch);
+  cursor:pointer;transition:border-color .2s ease,background .2s ease;
+}
+.groesse b{font-size:21px;font-weight:600;line-height:1.05}
+.groesse small{font-size:11px;color:var(--leise);text-align:center;line-height:1.2}
+.groesse span{font-size:13px;font-weight:600;color:var(--akzent-2);margin-top:2px}
+.groesse[aria-pressed="true"]{
+  border-color:color-mix(in srgb,var(--akzent) 70%,transparent);
+  background:color-mix(in srgb,var(--akzent) 12%,transparent);
+  box-shadow:0 8px 26px -12px var(--glut);
+}
+.groesse[aria-pressed="true"] b{color:var(--ink)}
+
+.daten{
+  display:grid;grid-template-columns:1fr 1fr;gap:0 18px;
+  margin:14px 0 0;padding:14px 0 0;border-top:1px solid var(--linie);
+}
+.daten div{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:13px}
+.daten dt{color:var(--leise);margin:0}
+.daten dd{margin:0;font-weight:500}
+
+/* ---------- Personen (Foto, Film) ---------- */
+.leute{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.mensch{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:9px 14px;border-radius:13px;
+  border:1px solid var(--linie);background:var(--flaeche-hoch);
+  cursor:pointer;text-align:left;
+  transition:border-color .2s ease,background .2s ease;
+}
+.mensch__text{display:flex;flex-direction:column;min-width:0;flex:1}
+.mensch__text b{font-size:14px;font-weight:600;line-height:1.3}
+.mensch__text small{
+  font-size:11.5px;line-height:1.35;color:var(--leise);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mensch__preis{font-size:14px;font-weight:600;color:var(--akzent-2);white-space:nowrap}
+
+.mensch[aria-pressed="true"]{
+  border-color:color-mix(in srgb,var(--akzent) 70%,transparent);
+  background:color-mix(in srgb,var(--akzent) 12%,transparent);
+  box-shadow:0 8px 26px -14px var(--glut);
+}
+
+/* ---------- Formular ---------- */
+.felder{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.feld{display:flex;flex-direction:column;gap:5px}
+.feld--breit{grid-column:1/-1}
+.feld span{font-size:12px;color:var(--leise)}
+.feld input,.feld textarea{
+  width:100%;background:var(--flaeche-hoch);color:var(--ink);
+  border:1px solid var(--linie);border-radius:12px;
+  padding:11px 12px;font:inherit;font-size:15px;
+}
+.feld textarea{resize:vertical}
+.feld input:focus,.feld textarea:focus{outline:none;border-color:var(--akzent)}
+
+.bald{display:flex;gap:8px;margin-top:16px}
+.bald__karte{
+  flex:1;padding:12px;border-radius:14px;
+  border:1px dashed var(--linie);color:var(--leise);
+}
+.bald__karte b{display:block;font-size:14px;color:var(--ink);opacity:.6}
+.bald__karte small{font-size:12px}
+
+.fein{font-size:12px;color:var(--leise);margin:12px 0 0}
+
+/* ---------- Warenkorb ---------- */
+.korb{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:var(--flaeche);
+  border-top:1px solid var(--linie);
+  border-radius:20px 20px 0 0;
+  transform:translateY(calc(100% - var(--korb-leiste) - var(--sicher)));
+  transition:transform .38s var(--weich);
+  max-height:88dvh;display:flex;flex-direction:column;
+  padding-bottom:var(--sicher);
+}
+.korb[data-offen="true"]{transform:translateY(0)}
+
+.korb__leiste{
+  display:flex;align-items:center;gap:12px;
+  width:100%;height:var(--korb-leiste);flex:none;
+  padding:0 16px;background:none;border:0;cursor:pointer;text-align:left;
+}
+.korb__chevron{display:grid;place-items:center;width:24px;height:24px;color:var(--leise);flex:none}
+.korb__chevron svg{width:22px;height:22px;transition:transform .38s var(--weich)}
+.korb[data-offen="true"] .korb__chevron svg{transform:rotate(180deg)}
+.korb__label{font-size:14px;color:var(--leise)}
+.korb__summe{margin-left:auto;font-family:var(--display);font-size:18px;font-weight:700}
+
+.korb__inhalt{
+  padding:0 16px 18px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.korb__titel{font-size:18px;margin-bottom:10px}
+.korb__leer{font-size:13.5px;color:var(--leise);margin:0 0 4px}
+
+.posten{list-style:none;margin:0;padding:0}
+.posten__zeile{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 0;border-bottom:1px solid var(--linie);
+}
+.posten__punkt{width:9px;height:9px;border-radius:50%;flex:none}
+.posten__punkt--dj{background:var(--violet-soft)}
+.posten__punkt--stage{background:var(--akzent)}
+.posten__punkt--skin{background:var(--magenta)}
+.posten__punkt--foto{background:var(--amber)}
+.posten__punkt--film{background:var(--cyan)}
+.posten__text{display:flex;flex-direction:column;min-width:0;flex:1}
+.posten__text b{font-size:14.5px;font-weight:600}
+.posten__text small{font-size:12px;color:var(--leise);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.posten__preis{font-size:14.5px;font-weight:600;white-space:nowrap}
+.posten__preis--frei{font-weight:500;color:var(--leise);font-size:13px}
+.posten__weg--leer{width:28px;height:28px;flex:none}
+.posten__weg{
+  width:28px;height:28px;flex:none;display:grid;place-items:center;
+  background:none;border:0;border-radius:50%;color:var(--leise);cursor:pointer;
+}
+.posten__weg svg{width:16px;height:16px}
+
+.korb__fuss{margin-top:16px}
+.korb__gesamt{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14px;color:var(--leise);
+}
+.korb__gesamt b{font-family:var(--display);font-size:24px;font-weight:700;color:var(--ink)}
+.korb__fuss .knopf{margin-top:14px}
+
+.korb__schleier{
+  position:fixed;inset:0;z-index:20;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(2px);
+}
+
+/* ==================================================================
+   Ab Tablet
+   ================================================================== */
+@media (min-width:640px){
+  .schritt__label{display:inline}
+  .wahl{padding:18px 24px 24px}
+  .karte{padding:22px}
+  .karte__titel{font-size:30px}
+  .kopf{padding:12px 24px}
+}
+
+/* ==================================================================
+   Desktop — gleiches Prinzip, nur mit Warenkorb-Spalte:
+   Fläche liegt fest, das Blatt scrollt darüber, der Korb steht rechts.
+   ================================================================== */
+@media (min-width:1000px){
+  :root{ --korb-b:380px; --flaeche-h:42dvh; --kopf-h:60px; }
+
+  .app{padding-right:var(--korb-b);padding-bottom:0}
+  .kopf{right:var(--korb-b);padding:0 32px}
+  .buehne{right:var(--korb-b)}
+
+  .blatt{
+    margin-top:-26px;
+    padding-bottom:14px;
+    /* wie mobil: zugeklappt füllt alles zusammen genau eine Bildhöhe */
+    min-height:calc(100dvh - var(--kopf-h) - var(--flaeche-h) + 26px);
+  }
+  .blatt__griff{display:none}
+  .wahl{padding:12px 32px 14px}
+  .klang{padding:0 32px}
+  .klang[data-sichtbar="true"]{height:180px;margin:16px 0 4px}
+  .klang iframe{height:180px}
+
+  .korb{
+    position:fixed;top:0;right:0;bottom:auto;left:auto;
+    width:var(--korb-b);height:100dvh;
+    transform:none!important;border-radius:0;
+    border-top:0;border-left:1px solid var(--linie);
+    max-height:none;padding-bottom:0;z-index:7;
+  }
+  .korb__leiste{display:none}
+  .korb__inhalt{padding:24px;display:flex;flex-direction:column;flex:1}
+  .korb__titel{font-size:20px;margin-bottom:14px}
+  .korb__fuss{margin-top:auto;padding-top:20px}
+  .korb__schleier{display:none}
+
+  .wischhinweis{top:18px}
+  .szene__nav{bottom:44px}
+  .ton{top:18px;right:18px;width:62px;height:62px}
+  .karte__kopf{align-items:baseline}
+  .preis{font-size:24px;padding-top:0}
+  .bald__karte{padding:14px}
+}
+
+@media (min-width:1280px){
+  :root{ --korb-b:400px }
+  .wahl{padding:14px 44px 16px}
+  .klang{padding:0 44px}
+  .kopf{padding:0 44px}
+}

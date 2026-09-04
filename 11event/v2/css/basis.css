@@ -1,0 +1,198 @@
+/* ==================================================================
+   BASIS — Farben, Schrift und die Bausteine, die sich Landingpage
+   und Konfigurator teilen.
+
+   Zwei Welten, ein Gerüst:
+     body                      = Party  (dunkel, Neon)
+     body[data-welt=hochzeit]  = Hochzeit (creme, warm)
+
+   Die Farbwerte stammen aus dem v2-Entwurf; die Marke (Logo, Amber)
+   bleibt daneben stehen, damit das Orange nicht verloren geht.
+   ================================================================== */
+
+:root{
+  /* ---- Party ---- */
+  --bg:#07070C;
+  --grund:#0B0B12;
+  --flaeche:#111018;
+  --flaeche-hoch:#171622;
+  --linie:rgba(255,255,255,.10);
+  --linie-stark:rgba(255,255,255,.16);
+
+  --ink:#F5F4F8;
+  --leise:#A6A2B8;
+  --schwach:#6F6B83;
+
+  --violet:#A855F7;
+  --violet-soft:#C084FC;
+  --magenta:#EC4899;
+  --cyan:#22D3EE;
+  --amber:#FBBF24;
+  --marke:#E8955A;          /* das Orange aus dem Logo */
+
+  --akzent:var(--violet);
+  --akzent-2:var(--magenta);
+  --auf-akzent:#FFFFFF;
+  --glut:rgba(168,85,247,.35);          /* Farbe des Leuchtens */
+
+  --display:'Space Grotesk','Inter',system-ui,sans-serif;
+  --schrift:'Inter',system-ui,-apple-system,sans-serif;
+
+  --r-karte:18px;
+  --r-gross:26px;
+  --r-knopf:999px;
+  --weich:cubic-bezier(.22,1,.36,1);
+  --sicher:env(safe-area-inset-bottom,0px);
+}
+
+/* ---- Hochzeit ---- */
+body[data-welt="hochzeit"]{
+  --bg:#FAF5EF;
+  --grund:#F4EBE0;
+  --flaeche:#FFFFFF;
+  --flaeche-hoch:#F7F0E7;
+  --linie:rgba(43,36,32,.12);
+  --linie-stark:rgba(43,36,32,.20);
+
+  --ink:#2B2420;
+  --leise:#7A6F63;
+  --schwach:#AB9F91;
+
+  --akzent:#CD8F88;                     /* Rosé  */
+  --akzent-2:#C9A35A;                   /* Gold  */
+  --auf-akzent:#FFFFFF;
+  --glut:rgba(205,143,136,.30);
+
+  --display:'Playfair Display',Georgia,serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--schrift);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:600;letter-spacing:-.02em;line-height:1.12}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--akzent);outline-offset:3px;border-radius:10px}
+
+/* ------------------------------------------------------------------
+   Leuchten — der Kern des Looks.
+   Weiche Farbflächen im Hintergrund statt echter Blur-Filter:
+   billiger auf dem Handy und sieht genauso aus.
+   ------------------------------------------------------------------ */
+.glut{
+  position:absolute;inset:0;
+  pointer-events:none;overflow:hidden;
+  z-index:0;
+}
+.glut::before,.glut::after{
+  content:'';position:absolute;border-radius:50%;
+  filter:blur(90px);opacity:.55;
+}
+.glut::before{
+  width:min(70vw,620px);aspect-ratio:1;
+  left:-10%;top:-30%;
+  background:var(--violet);
+}
+.glut::after{
+  width:min(60vw,520px);aspect-ratio:1;
+  right:-12%;top:-14%;
+  background:var(--cyan);
+}
+.glut span{
+  position:absolute;left:50%;bottom:-30%;
+  width:min(64vw,540px);aspect-ratio:1;
+  transform:translateX(-50%);
+  border-radius:50%;filter:blur(90px);opacity:.4;
+  background:var(--magenta);
+}
+body[data-welt="hochzeit"] .glut::before{background:#E7C9A8;opacity:.7}
+body[data-welt="hochzeit"] .glut::after{background:var(--akzent);opacity:.45}
+body[data-welt="hochzeit"] .glut span{background:#CFDAC4;opacity:.5}
+
+@media (prefers-reduced-motion:no-preference){
+  .glut::before{animation:treiben 22s ease-in-out infinite alternate}
+  .glut::after{animation:treiben 26s ease-in-out -6s infinite alternate-reverse}
+}
+@keyframes treiben{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(6%,5%,0) scale(1.12)}
+}
+
+/* ---------- Marke ----------
+   Das Logo ist ein senkrechtes Banner: die 11 steht, EVENT liegt.
+   Gedreht liegt zwangsläufig eines von beidem falsch — darum für die
+   Zeile eine eigene, waagerechte Sperrung aus denselben Formen.
+   Das Original steht als Kachel im Fuß. */
+.marke{display:inline-flex;align-items:center;gap:9px;text-decoration:none;flex:none}
+.marke__11{height:21px;width:auto;flex:none;fill:var(--marke)}
+.marke__wort{
+  font-family:var(--display);font-weight:700;font-size:19px;
+  letter-spacing:.015em;color:var(--ink);line-height:1;
+}
+.marke--gross .marke__11{height:30px}
+.marke--gross .marke__wort{font-size:27px}
+
+.kachel{
+  width:64px;border-radius:12px;overflow:hidden;flex:none;
+  box-shadow:0 10px 30px -14px rgba(0,0,0,.7);
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid transparent;border-radius:var(--r-knopf);
+  padding:13px 24px;
+  font-size:15px;font-weight:600;line-height:1;
+  text-decoration:none;cursor:pointer;
+  transition:transform .16s var(--weich),filter .2s ease,background .2s ease,border-color .2s ease;
+}
+.knopf:active{transform:scale(.97)}
+.knopf--voll{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+  box-shadow:0 10px 30px -8px var(--glut);
+}
+.knopf--leer{
+  background:color-mix(in srgb,var(--ink) 6%,transparent);
+  border-color:var(--linie-stark);color:var(--ink);
+  backdrop-filter:blur(8px);
+}
+.knopf--klein{padding:9px 16px;font-size:13.5px}
+.knopf:disabled{opacity:.45;cursor:default;box-shadow:none}
+@media (hover:hover){
+  .knopf--voll:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .knopf--leer:hover{background:color-mix(in srgb,var(--ink) 12%,transparent)}
+}
+
+/* ---------- Kleinteile ---------- */
+.pille{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--linie);border-radius:var(--r-knopf);
+  background:color-mix(in srgb,var(--flaeche) 70%,transparent);
+  padding:7px 15px;
+  font-size:11.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--leise);
+}
+.leuchtschrift{
+  background:linear-gradient(100deg,var(--violet),var(--magenta) 55%,var(--cyan));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body[data-welt="hochzeit"] .leuchtschrift{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  -webkit-background-clip:text;background-clip:text;
+}
+.leise{color:var(--leise)}
+.fein{font-size:12.5px;color:var(--schwach)}

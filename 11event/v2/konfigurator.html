@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070C">
+<title>Konfigurator — 11EVENT</title>
+<meta name="description" content="Stell deinen Abend zusammen: DJ wählen, Licht dazu, Summe läuft mit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ?v=… nach jeder Änderung hochzählen, sonst hält der Browser
+     bis zu vier Stunden die alte Datei fest (Cache von GitHub Pages). -->
+<link rel="stylesheet" href="css/basis.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=2">
+<script src="https://w.soundcloud.com/player/api.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="glut" aria-hidden="true"><span></span></div>
+
+  <header class="kopf">
+    <a class="marke" id="markeLink" href="index.html" aria-label="11EVENT — zur Startseite">
+      <svg class="marke__11" viewBox="0 0 455 790" aria-hidden="true"><path d="M0 43H200V790H90V163H0Z"/><path d="M245 0H455V790H335V118H245Z"/></svg><span class="marke__wort">EVENT</span>
+    </a>
+    <ol class="schritte" id="schritte" aria-label="Schritte"></ol>
+    <a class="kopf__raus" id="raus" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Übersicht</span>
+    </a>
+  </header>
+
+  <!-- Die Fläche liegt fest im Hintergrund, das Blatt scrollt darüber. -->
+  <div class="buehne" id="buehne">
+    <svg id="szene" class="szene" xmlns="http://www.w3.org/2000/svg"
+         viewBox="-320 -440 640 540" preserveAspectRatio="xMidYMid meet"
+         role="img" aria-label="Visuelle Vorschau deiner Auswahl"></svg>
+
+    <button class="ton" id="ton" type="button" aria-pressed="false" aria-label="Ton ausschalten">
+      <svg class="ton__an" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+        <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg class="ton__aus" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+        <path d="M17 9.5l5 5M22 9.5l-5 5"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div class="szene__nav" id="szeneNav" hidden>
+      <button class="pfeil" id="pfeilLinks" type="button" aria-label="Vorheriger DJ">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="punkte" id="punkte"></div>
+      <button class="pfeil" id="pfeilRechts" type="button" aria-label="Nächster DJ">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <p class="wischhinweis" id="wischhinweis" hidden>Wischen zum Durchsehen</p>
+  </div>
+  <div class="buehne__platz" aria-hidden="true"></div>
+
+  <section class="blatt">
+    <span class="blatt__griff" aria-hidden="true"></span>
+
+    <!-- DJ-Schritt. Steht dauerhaft im Dokument und wird nie ersetzt,
+         nur befüllt — sonst würde der Player unten die Musik verlieren. -->
+    <div class="klapp" id="djBlock" data-offen="true">
+     <div>
+      <div class="wahl">
+        <div class="karte">
+          <div class="karte__kopf">
+            <div>
+              <span class="hut" id="djHut"></span>
+              <h1 class="karte__titel" id="djName"></h1>
+              <p class="karte__stil" id="djStil"></p>
+            </div>
+            <div class="preis" id="djPreis"></div>
+          </div>
+
+          <div class="karte__fuss">
+            <button class="knopf knopf--voll" id="djWaehlen" type="button"></button>
+          </div>
+
+          <button class="mehr" id="djMehr" type="button" aria-expanded="false" aria-controls="djInfo">
+            <span id="djMehrText">Mehr</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="klapp" id="djInfo" data-offen="false">
+           <div>
+            <div class="mehr__inhalt">
+              <div class="portraet" id="djFoto"></div>
+              <p class="karte__text" id="djText"></p>
+              <dl class="daten" id="djFakten"></dl>
+              <ul class="links" id="djLinks"></ul>
+
+              <!-- Der Player. Wird nie verschoben und nie neu erzeugt. -->
+              <div class="klang">
+                <iframe id="scFrame" title="Set anhören" allow="autoplay"
+                        frameborder="0" scrolling="no"></iframe>
+              </div>
+            </div>
+           </div>
+          </div>
+        </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- Licht und Anfrage -->
+    <div class="wahl" id="wahl" aria-live="polite"></div>
+  </section>
+
+  <aside class="korb" id="korb" data-offen="false">
+    <button class="korb__leiste" id="korbLeiste" type="button" aria-expanded="false" aria-controls="korbInhalt">
+      <span class="korb__chevron" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="korb__label" id="korbLabel">Noch nichts gewählt</span>
+      <span class="korb__summe" id="korbSumme">0 €</span>
+    </button>
+
+    <div class="korb__inhalt" id="korbInhalt">
+      <h2 class="korb__titel" id="korbTitel">Euer Abend</h2>
+      <ul class="posten" id="posten"></ul>
+      <p class="korb__leer" id="korbLeer">Wählt einen DJ — die Bühne baut sich drumherum auf.</p>
+      <div class="korb__fuss">
+        <div class="korb__gesamt"><span>Gesamt</span><b id="korbGesamt">0 €</b></div>
+        <p class="fein">Alle Preise inkl. Anfahrt im Umkreis von 50 km. Unverbindlich.</p>
+        <button class="knopf knopf--voll" id="zurAnfrage" type="button" disabled>Zur Anfrage</button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div class="korb__schleier" id="korbSchleier" hidden></div>
+
+<script src="js/data.js?v=2"></script>
+<script src="js/scene.js?v=2"></script>
+<script src="js/klang.js?v=2"></script>
+<script src="js/app.js?v=2"></script>
+</body>
+</html>
