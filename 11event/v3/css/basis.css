@@ -1,0 +1,317 @@
+/* ==================================================================
+   BASIS — ein Gerüst, drei Häute.
+
+   Alle Seiten benutzen dieselben Bausteine (.knopf, .karte, .kopf,
+   .held …). Wie die aussehen, entscheidet allein das Attribut am
+   <body>:  data-welt="wedding" | "corporate" | "private".
+
+   Es gibt bewusst KEINE Standardwelt — wer eine Seite anlegt, muss
+   sich entscheiden.
+   ================================================================== */
+
+:root{
+  --r-knopf:999px;
+  --weich:cubic-bezier(.22,1,.36,1);
+  --sicher:env(safe-area-inset-bottom,0px);
+  --marke:#E8955A;                 /* das Orange aus dem Logo */
+}
+
+/* ==================================================================
+   HOCHZEIT — weiß, weit, Serife. Nichts drängt sich vor.
+   ================================================================== */
+body[data-welt="wedding"]{
+  --bg:#FDFBF7;
+  --grund:#F6F1E9;
+  --flaeche:#FFFFFF;
+  --flaeche-hoch:#F9F5EE;
+  --linie:rgba(34,28,24,.10);
+  --linie-stark:rgba(34,28,24,.22);
+
+  --ink:#221C18;
+  --leise:#6F6459;
+  --schwach:#A2988B;
+
+  --akzent:#B08D57;                /* Gold  */
+  --akzent-2:#C9A87C;
+  --auf-akzent:#FFFFFF;
+  --glut:rgba(176,141,87,.22);
+  --stimmung:#D9A94E;
+
+  --display:'Cormorant Garamond',Georgia,serif;
+  --schrift:'Inter',system-ui,sans-serif;
+
+  --r-karte:2px;                   /* fast eckig — wirkt gedruckt */
+  --r-gross:3px;
+  --karte-schatten:none;
+  --karte-rand:1px solid var(--linie);
+  --titel-gewicht:400;
+  --titel-sperr:-.01em;
+  --hut-sperr:.24em;
+  --knopf-radius:999px;
+  --knopf-rand:1px solid var(--linie-stark);
+}
+
+/* ==================================================================
+   CORPORATE — hell, gebaut, sachlich. Kanten statt Kurven.
+   ================================================================== */
+body[data-welt="corporate"]{
+  --bg:#F5F7FA;
+  --grund:#EAEFF5;
+  --flaeche:#FFFFFF;
+  --flaeche-hoch:#F0F4F9;
+  --linie:rgba(15,23,42,.12);
+  --linie-stark:rgba(15,23,42,.24);
+
+  --ink:#0F172A;
+  --leise:#556074;
+  --schwach:#8A94A6;
+
+  --akzent:#2563EB;
+  --akzent-2:#0EA5E9;
+  --auf-akzent:#FFFFFF;
+  --glut:rgba(37,99,235,.20);
+  --stimmung:#2563EB;
+
+  --display:'Space Grotesk','Inter',sans-serif;
+  --schrift:'Inter',system-ui,sans-serif;
+
+  --r-karte:10px;
+  --r-gross:14px;
+  --karte-schatten:0 1px 2px rgba(15,23,42,.05);
+  --karte-rand:1px solid var(--linie);
+  --titel-gewicht:600;
+  --titel-sperr:-.025em;
+  --hut-sperr:.14em;
+  --knopf-radius:10px;             /* eckiger als die anderen */
+  --knopf-rand:1px solid var(--linie-stark);
+}
+
+/* ==================================================================
+   PRIVATE — dunkel, Glas, ein Leuchten. Zurückhaltend statt bunt.
+   ================================================================== */
+body[data-welt="private"]{
+  --bg:#08080C;
+  --grund:#0B0B11;
+  --flaeche:rgba(255,255,255,.045);
+  --flaeche-hoch:rgba(255,255,255,.075);
+  --linie:rgba(255,255,255,.10);
+  --linie-stark:rgba(255,255,255,.20);
+
+  --ink:#F2F1F6;
+  --leise:#9E9BAE;
+  --schwach:#6A6779;
+
+  --akzent:#8B5CF6;
+  --akzent-2:#6366F1;
+  --auf-akzent:#FFFFFF;
+  --glut:rgba(139,92,246,.40);
+  --stimmung:#8B5CF6;
+
+  --display:'Space Grotesk','Inter',sans-serif;
+  --schrift:'Inter',system-ui,sans-serif;
+
+  --r-karte:18px;
+  --r-gross:26px;
+  --karte-schatten:0 1px 0 rgba(255,255,255,.06) inset;
+  --karte-rand:1px solid var(--linie);
+  --titel-gewicht:600;
+  --titel-sperr:-.03em;
+  --hut-sperr:.13em;
+  --knopf-radius:999px;
+  --knopf-rand:1px solid var(--linie-stark);
+}
+
+/* ==================================================================
+   WAHL — die Eingangsseite. Gehört noch zu keiner Welt, also neutral.
+   ================================================================== */
+body[data-welt="wahl"]{
+  --bg:#0A0A0C;
+  --grund:#0E0E11;
+  --flaeche:rgba(255,255,255,.05);
+  --flaeche-hoch:rgba(255,255,255,.08);
+  --linie:rgba(255,255,255,.12);
+  --linie-stark:rgba(255,255,255,.24);
+  --ink:#F4F4F6;
+  --leise:#A0A0AA;
+  --schwach:#6C6C77;
+  --akzent:#E8955A;
+  --akzent-2:#C9A35A;
+  --auf-akzent:#14100C;
+  --glut:rgba(232,149,90,.30);
+  --stimmung:#8B5CF6;
+  --display:'Space Grotesk','Inter',sans-serif;
+  --schrift:'Inter',system-ui,sans-serif;
+  --r-karte:16px;--r-gross:24px;
+  --karte-schatten:none;
+  --karte-rand:1px solid var(--linie);
+  --titel-gewicht:600;--titel-sperr:-.03em;--hut-sperr:.14em;
+  --knopf-radius:999px;--knopf-rand:1px solid var(--linie-stark);
+}
+
+/* Glas gibt es nur in der dunklen Welt */
+body[data-welt="private"] .glas{
+  backdrop-filter:blur(18px) saturate(1.5);
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);
+}
+
+/* ==================================================================
+   Gemeinsames
+   ================================================================== */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--schrift);
+  font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{
+  margin:0;font-family:var(--display);
+  font-weight:var(--titel-gewicht);
+  letter-spacing:var(--titel-sperr);
+  line-height:1.12;
+}
+body[data-welt="wedding"] h1,
+body[data-welt="wedding"] h2{line-height:1.06}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--akzent);outline-offset:3px;border-radius:6px}
+
+/* ---------- Leuchten im Hintergrund ---------- */
+.glut{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.glut i{
+  position:absolute;border-radius:50%;
+  filter:blur(90px);display:block;
+}
+.glut i:nth-child(1){width:min(70vw,620px);aspect-ratio:1;left:-12%;top:-32%;
+  background:var(--akzent);opacity:.30}
+.glut i:nth-child(2){width:min(58vw,520px);aspect-ratio:1;right:-14%;top:-16%;
+  background:var(--akzent-2);opacity:.24}
+.glut i:nth-child(3){width:min(62vw,540px);aspect-ratio:1;left:50%;bottom:-34%;
+  transform:translateX(-50%);background:var(--stimmung);opacity:.18}
+
+body[data-welt="private"] .glut i:nth-child(1){opacity:.42}
+body[data-welt="private"] .glut i:nth-child(2){opacity:.30}
+body[data-welt="wedding"] .glut i{filter:blur(110px)}
+body[data-welt="corporate"] .glut i{opacity:.14}
+
+@media (prefers-reduced-motion:no-preference){
+  .glut i:nth-child(1){animation:treiben 24s ease-in-out infinite alternate}
+  .glut i:nth-child(2){animation:treiben 30s ease-in-out -8s infinite alternate-reverse}
+}
+@keyframes treiben{from{transform:translate3d(0,0,0) scale(1)}
+                   to{transform:translate3d(6%,5%,0) scale(1.14)}}
+.glut i:nth-child(3){animation:none!important}
+
+/* ---------- Marke ----------
+   Das Logo ist ein senkrechtes Banner (die 11 steht, EVENT liegt).
+   Für die Zeile darum eine eigene waagerechte Sperrung. */
+.marke{display:inline-flex;align-items:center;gap:9px;text-decoration:none;flex:none}
+.marke__11{height:21px;width:auto;flex:none;fill:var(--marke)}
+.marke__wort{
+  font-family:var(--display);font-weight:700;font-size:19px;
+  letter-spacing:.02em;color:var(--ink);line-height:1;
+}
+body[data-welt="wedding"] .marke__wort{font-weight:500;letter-spacing:.14em;font-size:20px}
+body[data-welt="wedding"] .marke__11{fill:var(--akzent)}
+body[data-welt="corporate"] .marke__11{fill:var(--ink)}
+.marke--gross .marke__11{height:30px}
+.marke--gross .marke__wort{font-size:27px}
+
+/* ---------- Knöpfe ---------- */
+.knopf{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid transparent;border-radius:var(--knopf-radius);
+  padding:13px 24px;
+  font-size:15px;font-weight:600;line-height:1;
+  text-decoration:none;cursor:pointer;
+  transition:transform .16s var(--weich),filter .2s ease,background .2s ease,border-color .2s ease;
+}
+body[data-welt="wedding"] .knopf{
+  font-family:var(--schrift);font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;font-size:12.5px;
+  padding:15px 30px;
+}
+.knopf:active{transform:scale(.97)}
+.knopf--voll{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+  box-shadow:0 10px 30px -10px var(--glut);
+}
+body[data-welt="wedding"] .knopf--voll{background:var(--akzent);box-shadow:none}
+body[data-welt="corporate"] .knopf--voll{background:var(--akzent);box-shadow:0 2px 8px -2px var(--glut)}
+.knopf--leer{
+  background:color-mix(in srgb,var(--ink) 5%,transparent);
+  border:var(--knopf-rand);color:var(--ink);
+}
+body[data-welt="private"] .knopf--leer{
+  background:var(--flaeche);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+body[data-welt="wedding"] .knopf--leer{background:transparent}
+.knopf--klein{padding:9px 16px;font-size:13.5px}
+body[data-welt="wedding"] .knopf--klein{padding:10px 18px;font-size:11px}
+.knopf:disabled{opacity:.45;cursor:default;box-shadow:none}
+@media (hover:hover){
+  .knopf--voll:hover{filter:brightness(1.07);transform:translateY(-1px)}
+  .knopf--leer:hover{background:color-mix(in srgb,var(--ink) 10%,transparent)}
+}
+
+/* ---------- Kleinteile ---------- */
+.pille{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--linie);border-radius:var(--r-knopf);
+  background:color-mix(in srgb,var(--flaeche) 80%,transparent);
+  padding:7px 16px;
+  font-size:11px;font-weight:600;
+  letter-spacing:var(--hut-sperr);text-transform:uppercase;
+  color:var(--leise);
+}
+body[data-welt="corporate"] .pille{border-radius:6px}
+.hut{
+  display:block;font-size:11px;font-weight:700;
+  letter-spacing:var(--hut-sperr);text-transform:uppercase;
+  color:var(--akzent);margin-bottom:12px;
+}
+body[data-welt="wedding"] .hut{color:var(--leise);font-weight:500}
+.leuchtschrift{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body[data-welt="private"] .leuchtschrift{
+  background:linear-gradient(100deg,#A78BFA,#818CF8 55%,#22D3EE);
+  -webkit-background-clip:text;background-clip:text;
+}
+body[data-welt="wedding"] .leuchtschrift{
+  background:none;color:var(--akzent);font-style:italic;
+}
+.leise{color:var(--leise)}
+.fein{font-size:12.5px;color:var(--schwach);line-height:1.5}
+
+/* ------------------------------------------------------------------
+   Tiefenschärfe in der Szene: die Bühne wird weich, die Person davor
+   bleibt scharf. Der Weichzeichner sitzt in Bildschirm-Pixeln, bleibt
+   also gleich, egal wie weit die Kamera herausgefahren ist.
+   ------------------------------------------------------------------ */
+#lTiefe{transition:filter .55s var(--weich),opacity .55s ease}
+#lTiefe.unscharf{filter:blur(5px) saturate(.85);opacity:.72}
+@media (max-width:520px){ #lTiefe.unscharf{filter:blur(3.5px) saturate(.85)} }
+
+.fokusfigur{
+  animation:tritt-vor .5s cubic-bezier(.2,1.1,.4,1) both;
+  animation-delay:calc(var(--v,0) * 1s);
+}
+@keyframes tritt-vor{
+  from{opacity:0;transform:translateY(46px) scale(.94)}
+  to{opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  #lTiefe{transition:none}
+  .fokusfigur{animation:none}
+}

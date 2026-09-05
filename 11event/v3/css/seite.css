@@ -1,0 +1,225 @@
+/* ==================================================================
+   SEITE — Aufbau der Seiten. Farben kommen aus basis.css.
+   ================================================================== */
+
+body{overflow-x:hidden}
+
+/* ---------- Kopf ---------- */
+.kopf{
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--linie);
+  background:color-mix(in srgb,var(--bg) 80%,transparent);
+  backdrop-filter:blur(16px) saturate(1.4);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+}
+.kopf__inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;gap:18px;padding:12px 20px;
+}
+.kopf__nav{display:none;gap:26px;margin-left:16px}
+.kopf__nav a{
+  font-size:14px;font-weight:500;color:var(--leise);
+  text-decoration:none;transition:color .2s ease;
+}
+body[data-welt="wedding"] .kopf__nav a{
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+}
+.kopf__nav a:hover,.kopf__nav a[aria-current="page"]{color:var(--ink)}
+.kopf__rechts{display:flex;align-items:center;gap:10px;margin-left:auto}
+.kopf__welt{display:none}
+
+.menue{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;flex:none;
+  border:1px solid var(--linie);border-radius:var(--knopf-radius);
+  background:none;cursor:pointer;
+}
+.menue span{position:relative;display:block;width:17px;height:13px}
+.menue span i{
+  position:absolute;left:0;height:2px;width:17px;border-radius:2px;
+  background:currentColor;transition:transform .25s var(--weich),opacity .2s ease;
+}
+.menue span i:nth-child(1){top:0}
+.menue span i:nth-child(2){top:5.5px}
+.menue span i:nth-child(3){top:11px}
+.menue[aria-expanded="true"] i:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.menue[aria-expanded="true"] i:nth-child(2){opacity:0}
+.menue[aria-expanded="true"] i:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+.schublade{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--weich);border-top:1px solid transparent}
+.schublade>div{overflow:hidden}
+.schublade[data-offen="true"]{grid-template-rows:1fr;border-top-color:var(--linie)}
+.schublade__inner{display:flex;flex-direction:column;padding:10px 20px 16px}
+.schublade a{padding:11px 0;font-size:15px;font-weight:500;color:var(--leise);text-decoration:none}
+.schublade a:hover{color:var(--ink)}
+
+@media (min-width:940px){
+  .kopf__nav{display:flex}
+  .kopf__welt{display:inline-flex}
+  .menue,.schublade{display:none}
+  .kopf__inner{padding:14px 28px}
+}
+
+/* ---------- Abschnitte ---------- */
+.bahn{position:relative;padding:60px 20px}
+.bahn__inner{position:relative;z-index:1;max-width:1200px;margin:0 auto}
+.bahn--linie{border-top:1px solid var(--linie)}
+.bahn--grund{background:var(--grund)}
+.bahn h2{font-size:clamp(26px,5.4vw,42px)}
+body[data-welt="wedding"] .bahn h2{font-size:clamp(30px,6.4vw,52px)}
+.bahn__text{margin-top:14px;max-width:56ch;color:var(--leise);font-size:16px}
+
+/* ---------- Held ---------- */
+.held{position:relative;overflow:hidden;padding:64px 20px 58px;text-align:center}
+.held__inner{position:relative;z-index:1;max-width:940px;margin:0 auto}
+.held h1{font-size:clamp(34px,8.4vw,70px);margin-top:22px}
+body[data-welt="wedding"] .held h1{font-size:clamp(38px,10vw,84px);letter-spacing:0}
+.held__text{margin:22px auto 0;max-width:60ch;font-size:clamp(15px,3.6vw,18px);color:var(--leise)}
+.held__knoepfe{margin-top:32px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.held__zahlen{margin:48px auto 0;max-width:780px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.held__zahlen div{
+  border:var(--karte-rand);border-radius:var(--r-karte);
+  background:color-mix(in srgb,var(--flaeche) 70%,transparent);
+  padding:16px 10px;
+}
+.held__zahlen b{display:block;font-family:var(--display);font-size:clamp(19px,4.6vw,28px);font-weight:var(--titel-gewicht)}
+.held__zahlen span{display:block;margin-top:4px;font-size:11.5px;color:var(--schwach);line-height:1.35}
+
+/* ---------- Karten ---------- */
+.raster{display:grid;gap:16px;margin-top:32px}
+@media (min-width:700px){ .raster--3{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:640px){ .raster--2{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:900px){ .raster--4{grid-template-columns:repeat(4,1fr)} }
+
+.karte{
+  position:relative;display:flex;flex-direction:column;
+  border:var(--karte-rand);border-radius:var(--r-gross);
+  background:var(--flaeche);box-shadow:var(--karte-schatten);
+  padding:24px 22px;
+  transition:border-color .25s ease,transform .25s var(--weich);
+}
+body[data-welt="private"] .karte{
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+@media (hover:hover){ .karte:hover{border-color:var(--linie-stark);transform:translateY(-3px)} }
+.karte h3{font-size:19px;margin-bottom:8px}
+body[data-welt="wedding"] .karte h3{font-size:23px}
+.karte p{color:var(--leise);font-size:14.5px}
+.karte__nr{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;margin-bottom:16px;
+  border-radius:var(--r-karte);font-family:var(--display);font-weight:700;font-size:15px;
+  background:linear-gradient(140deg,var(--akzent),var(--akzent-2));color:var(--auf-akzent);
+}
+body[data-welt="wedding"] .karte__nr{
+  background:none;color:var(--akzent);border:1px solid var(--akzent);
+  border-radius:50%;font-size:16px;font-weight:400;
+}
+
+/* Karte als Link */
+a.karte{text-decoration:none}
+.karte__pfeil{margin-top:auto;padding-top:18px;font-size:13.5px;font-weight:600;color:var(--akzent)}
+
+/* ---------- Bild (flach gezeichnet statt Foto) ---------- */
+.bild{
+  position:relative;margin:-24px -22px 18px;
+  border-radius:var(--r-gross) var(--r-gross) 0 0;overflow:hidden;
+  aspect-ratio:16/10;background:var(--flaeche-hoch);
+}
+.bild svg{display:block;width:100%;height:100%}
+.bild--breit{aspect-ratio:21/9}
+
+/* ---------- Vorschaubühne ---------- */
+.vorschau{
+  position:relative;margin-top:30px;
+  border:var(--karte-rand);border-radius:var(--r-gross);
+  overflow:hidden;background:#07070C;aspect-ratio:4/3;max-height:520px;
+}
+.vorschau svg{display:block;width:100%;height:100%}
+.vorschau__band{
+  position:absolute;left:0;right:0;bottom:0;
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 18px;
+  background:linear-gradient(to top,rgba(7,7,12,.92),transparent);
+}
+.vorschau__band p{flex:1;min-width:180px;font-size:13.5px;color:#A6A2B8}
+@media (min-width:640px){ .vorschau{aspect-ratio:16/9} }
+
+/* ---------- Preis / Leistung ---------- */
+.preisz{font-family:var(--display);font-size:26px;font-weight:var(--titel-gewicht);margin:2px 0}
+.preisz small{font-size:13px;font-weight:400;color:var(--leise);font-family:var(--schrift)}
+.liste{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.liste li{display:flex;gap:10px;font-size:14px;color:var(--ink)}
+.liste li::before{
+  content:'';flex:none;width:6px;height:6px;margin-top:8px;border-radius:50%;
+  background:var(--akzent);
+}
+.daten{display:grid;grid-template-columns:1fr;gap:0;margin:16px 0 0;padding:14px 0 0;border-top:1px solid var(--linie)}
+.daten div{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:13.5px}
+.daten dt{color:var(--leise);margin:0}
+.daten dd{margin:0;font-weight:500;text-align:right}
+@media (min-width:640px){ .daten{grid-template-columns:1fr 1fr;gap:0 28px} }
+
+/* ---------- Personenzeichen ---------- */
+.zeichen{
+  width:54px;height:54px;flex:none;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:15px;color:#fff;
+  background:linear-gradient(140deg,var(--akzent),var(--akzent-2));
+}
+body[data-welt="wedding"] .zeichen{
+  background:none;border:1px solid var(--akzent);color:var(--akzent);font-weight:400;font-size:17px;
+}
+.kopfzeile{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.kopfzeile b{display:block;font-family:var(--display);font-size:17px;font-weight:var(--titel-gewicht);line-height:1.25}
+.kopfzeile small{display:block;margin-top:2px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--leise)}
+
+/* ---------- Bibliothek ---------- */
+.gruppe{margin-top:44px}
+.gruppe:first-of-type{margin-top:8px}
+.gruppe__kopf{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;justify-content:space-between}
+.gruppe__kopf h2{font-size:clamp(22px,4.6vw,32px)}
+.gruppe__kopf p{color:var(--leise);font-size:14.5px;max-width:46ch}
+
+/* ---------- Portfolio ---------- */
+.portfolio{display:grid;gap:14px;margin-top:20px}
+@media (min-width:640px){ .portfolio{grid-template-columns:repeat(2,1fr)} }
+.stueck{border:var(--karte-rand);border-radius:var(--r-gross);overflow:hidden;background:var(--flaeche)}
+.stueck svg{display:block;width:100%;aspect-ratio:4/3}
+.stueck__text{padding:14px 16px 16px}
+.stueck__text b{display:block;font-family:var(--display);font-size:16px;font-weight:var(--titel-gewicht)}
+.stueck__text small{display:block;margin-top:3px;font-size:13px;color:var(--leise)}
+
+/* ---------- Ruf ---------- */
+.ruf{
+  position:relative;overflow:hidden;
+  border:var(--karte-rand);border-radius:var(--r-gross);
+  background:var(--flaeche);padding:42px 24px;text-align:center;
+}
+.ruf h2{font-size:clamp(24px,5vw,38px)}
+.ruf p{margin:14px auto 0;max-width:48ch;color:var(--leise)}
+.ruf .held__knoepfe{margin-top:24px}
+
+/* ---------- Fuß ---------- */
+.fuss{border-top:1px solid var(--linie);padding:38px 20px 48px;background:var(--grund)}
+.fuss__inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.fuss__links{display:flex;flex-wrap:wrap;gap:18px}
+.fuss__links a{font-size:14px;color:var(--leise);text-decoration:none}
+.fuss__links a:hover{color:var(--ink)}
+.fuss__recht{font-size:13px;color:var(--leise)}
+.kachel{width:60px;border-radius:var(--r-karte);overflow:hidden;flex:none}
+@media (min-width:820px){ .fuss__inner{flex-direction:row;align-items:flex-start;justify-content:space-between} }
+
+@media (min-width:760px){
+  .bahn{padding:80px 28px}
+  .held{padding:92px 28px 80px}
+  .karte{padding:28px 26px}
+  .bild{margin:-28px -26px 20px}
+}
+
+/* Beim Scrollen einblenden */
+.kommt{opacity:0;transform:translateY(16px)}
+.kommt.da{opacity:1;transform:none;transition:opacity .6s ease,transform .6s var(--weich)}
+@media (prefers-reduced-motion:reduce){
+  .kommt{opacity:1;transform:none}
+  .glut i{animation:none!important}
+}

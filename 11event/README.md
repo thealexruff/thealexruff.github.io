@@ -1,41 +1,32 @@
 # 11EVENT
 
-Zwei Stände nebeneinander:
+Drei Stände nebeneinander:
 
 | Ordner | Was |
 |--------|-----|
-| `v1/`  | Der Konfigurator, wie er vor dem Umbau war. Läuft weiter, wird aber nicht mehr gepflegt. |
-| `v2/`  | Aktuell. Landingpage, Hochzeitswelt, Partnerseite — und derselbe Konfigurator, neu eingekleidet. |
+| `v1/`  | Der erste Konfigurator. Eingefroren. |
+| `v2/`  | Landingpage, Hochzeitswelt, Partnerseite. Eingefroren. |
+| `v3/`  | **Aktuell.** Eingangsseite, drei Anlässe mit eigenem Aussehen, Bibliothek, Detailseiten, Konfigurator. |
 
-Live: `…/11event/` leitet auf **v2** weiter, `…/11event/v1/` bleibt zum Vergleich stehen.
+Live: `…/11event/` leitet auf **v3** weiter, `v1` und `v2` bleiben zum Vergleich stehen.
 
-## Was v2 von v1 übernimmt
+## Was v3 ändert
 
-Alles, was die Sache ausmacht: die flachen Figuren, die Bühne, die sich um den
-DJ herum aufbaut, der Abgleich statt Neuaufbau beim Größenwechsel, der
-Stummschalter, der mitlaufende Warenkorb, die Regel „eine Seite, kein Scrollen".
+Bis v2 gab es eine Seite mit einem Hochzeits-Anstrich. v3 dreht das um:
 
-## Was aus dem v2-Entwurf dazukam
+* **Eine Eingangsseite** mit drei Anlässen — Hochzeit, Firmenevent, Private.
+* **Drei eigenständige Welten** statt einer Seite mit Varianten. Jede hat
+  ihre eigene Schrift, Form und Farbe; die Ordner sind so geschnitten, dass
+  daraus später Subdomains werden.
+* **Eine Leistungsbibliothek** mit eigener Seite je Leistung, inklusive
+  Arbeitsproben bei Foto und Video.
+* **Ein Katalog als einzige Quelle.** Was dort steht, erscheint automatisch
+  in Bibliothek, Detailseite *und* Konfigurator — auch neue Kategorien
+  werden zu neuen Schritten.
+* **LED-Wand** als eigene Kategorie, nur bei Corporate.
+* **Bühnenbilder je Anlass**: Blüten und Kerzenschein bei Hochzeiten,
+  Portal und Markenfläche bei Corporate, Mainstage und Neon bei Private.
+* **Fokusschritt** für Foto und Video: die Kamera fährt heraus, die Bühne
+  wird unscharf und läuft weiter, die Person tritt nach vorn.
 
-* **Farben und Leuchten** — die Palette aus dem Entwurf (Violett, Magenta,
-  Cyan, Amber) ersetzt Kobalt/Apricot. Sie sitzt jetzt auch in den
-  Lichtstrahlen, wo sie eigentlich hingehört.
-* **Landingpage** — vorher gab es keine. Der Konfigurator hat eine eigene
-  Seite, die Startseite erklärt erst mal, worum es geht.
-* **Hochzeitswelt** — creme statt schwarz, Serifenschrift, Gold und Rosé.
-  Derselbe Konfigurator unter `?welt=hochzeit`, nur mit warmen Lichtfarben.
-* **Partnerseite** — Planung, Trauung, Blumen, Raum. Mit Filter.
-* **Foto und Film** — waren im alten Konfigurator nur Platzhalter, sind jetzt
-  echte Schritte mit eigenen Figuren auf der Fläche.
-
-## Was bewusst nicht übernommen wurde
-
-* Die Schritt-Sperre („Schließt den DJ-Schritt ab, um…") mit ausgegrauten
-  Abschnitten. Wer springen will, soll springen können.
-* „Ohne Licht fortfahren" — die kleine Stage ist bei jeder Buchung dabei.
-* Die Bühnenvorschau aus CSS-Divs. Die aus v1 kann mehr.
-* Das gedrehte Logo im Kopf: das Original ist ein senkrechtes Banner, gedreht
-  liegt die 11 auf der Seite. Für die Zeile gibt es jetzt eine eigene,
-  waagerechte Sperrung aus denselben Formen.
-
-Details zu v2 in [`v2/README.md`](v2/README.md).
+Details in [`v3/README.md`](v3/README.md).

@@ -1,0 +1,87 @@
+/* ==================================================================
+   WAHL — die Eingangsseite: drei Karten, eine Entscheidung.
+   ================================================================== */
+
+.wahlseite{
+  min-height:100dvh;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.wahlseite__kopf{
+  position:relative;z-index:2;
+  display:flex;justify-content:center;
+  padding:30px 20px 0;
+}
+.wahlseite__mitte{
+  position:relative;z-index:2;flex:1;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:30px 0 20px;
+}
+.wahlseite__titel{text-align:center;padding:0 20px;max-width:620px;margin:0 auto}
+.wahlseite__titel h1{font-size:clamp(28px,7vw,46px);margin-top:16px}
+.wahlseite__titel p{margin-top:14px;color:var(--leise);font-size:15.5px}
+
+/* ---------- Karussell ---------- */
+.karussell{
+  display:flex;gap:16px;
+  margin-top:34px;padding:6px 20px 20px;
+  overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.karussell::-webkit-scrollbar{display:none}
+
+.welt{
+  position:relative;flex:0 0 78%;max-width:340px;
+  scroll-snap-align:center;
+  display:flex;flex-direction:column;
+  border:1px solid var(--linie);border-radius:var(--r-gross);
+  overflow:hidden;text-decoration:none;
+  background:var(--flaeche);
+  transition:transform .3s var(--weich),border-color .3s ease;
+}
+@media (hover:hover){ .welt:hover{transform:translateY(-4px);border-color:var(--linie-stark)} }
+.welt:active{transform:scale(.985)}
+
+/* Jede Karte zeigt ihre eigene Welt schon im Kleinen */
+.welt__probe{
+  position:relative;aspect-ratio:4/3;overflow:hidden;
+  display:grid;place-items:center;
+}
+.welt__probe svg{width:100%;height:100%;display:block}
+.welt__text{padding:20px 20px 22px;display:flex;flex-direction:column;flex:1}
+.welt__name{font-family:var(--display);font-size:24px;font-weight:600;letter-spacing:-.02em}
+.welt__satz{margin-top:8px;font-size:14px;color:var(--leise);flex:1}
+.welt__mehr{
+  margin-top:18px;display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--akzent);
+}
+.welt__mehr svg{width:15px;height:15px}
+
+/* Farbtupfer je Welt */
+.welt[data-fuer="wedding"] .welt__mehr{color:#C9A87C}
+.welt[data-fuer="corporate"] .welt__mehr{color:#5B9BF8}
+.welt[data-fuer="private"] .welt__mehr{color:#A78BFA}
+
+/* ---------- Punkte ---------- */
+.wahlpunkte{display:flex;justify-content:center;gap:8px;margin-top:4px}
+.wahlpunkte button{
+  width:8px;height:8px;padding:0;border:0;border-radius:50%;
+  background:var(--schwach);cursor:pointer;
+  transition:width .25s var(--weich),background .25s ease;
+}
+.wahlpunkte button[aria-current="true"]{width:22px;border-radius:4px;background:var(--akzent)}
+
+.wahlseite__fuss{
+  position:relative;z-index:2;text-align:center;
+  padding:8px 20px 30px;font-size:12.5px;color:var(--schwach);
+}
+.wahlseite__fuss a{color:var(--leise)}
+
+@media (min-width:860px){
+  .karussell{
+    justify-content:center;overflow:visible;
+    padding:6px 28px 24px;gap:22px;
+  }
+  .welt{flex:0 0 300px}
+  .wahlpunkte{display:none}
+  .wahlseite__mitte{padding:40px 0}
+}
