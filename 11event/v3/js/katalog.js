@@ -25,7 +25,15 @@ const WELTEN = {
     /* Farben der Lichtstrahlen in der Szene */
     strahlen: ['#D9A94E', '#D69B93', '#EBD3B0', '#B9C4A8'],
     /* Wie dunkel die Bühnenfläche im Konfigurator ist */
-    flaeche: '#1A1512',
+    /* Die einzige helle Bühne: bei Hochzeiten ist der Saal hell, und
+       das Licht arbeitet als warme Fläche statt als Strahl im Dunkeln. */
+    hell: true,
+    szene: {
+      wand:'#F3ECE1', boden:'#E7DBCA', kante:'#D2C2AC',
+      metall:'#9A8E7E', metallHell:'#B4A897', dunkel:'#6B6053',
+      publikum:'#7A6C5C', pult:'#8A7C6A', pultTief:'#6E6153',
+      strahlBreit:.30, strahlKern:.40, tube:.55
+    },
     ordner: 'wedding',
     motiv: 'deko',
     unter: 'Für die Trauung braucht ihr kein Licht von uns. Für alles danach schon. '
@@ -42,7 +50,13 @@ const WELTEN = {
     kopf: 'Technik, die nicht auffällt — bis sie es soll',
     zeile: 'Corporate',
     strahlen: ['#3B82F6', '#64748B', '#E2E8F0', '#0EA5E9'],
-    flaeche: '#0E1116',
+    hell: false,
+    szene: {
+      wand:'#0E1116', boden:'#161B23', kante:'#232B36',
+      metall:'#3A4152', metallHell:'#2E3444', dunkel:'#1B1F2B',
+      publikum:'#05070B', pult:'#171A22', pultTief:'#262B37',
+      strahlBreit:.16, strahlKern:.22, tube:.85
+    },
     ordner: 'corporate',
     motiv: 'led',
     unter: 'Keynote am Nachmittag, Abendveranstaltung danach — mit einem Aufbau. '
@@ -59,7 +73,13 @@ const WELTEN = {
     kopf: 'Licht, das die Nacht trägt',
     zeile: 'Private',
     strahlen: ['#A855F7', '#EC4899', '#22D3EE', '#FBBF24'],
-    flaeche: '#07070C',
+    hell: false,
+    szene: {
+      wand:'#07070C', boden:'#12131A', kante:'#20222C',
+      metall:'#3A4152', metallHell:'#2E3444', dunkel:'#1B1F2B',
+      publikum:'#05060A', pult:'#171A22', pultTief:'#262B37',
+      strahlBreit:.16, strahlKern:.22, tube:.85
+    },
     ordner: 'private',
     motiv: 'tanz',
     unter: 'Traversen, Movingheads, Sunbars, Laser und Nebel — gefahren auf GrandMA3. '

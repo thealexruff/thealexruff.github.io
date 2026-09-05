@@ -43,8 +43,8 @@ siebten Schritt, ohne dass `app.js` angefasst werden muss.
 
 * `karussell` — eine Figur, seitlich durchwischbar (DJ)
 * `stufen` — S/M/L, immer eine davon gewählt (`pflicht: true`)
-* `fokus` — Kamera fährt heraus, Bühne wird unscharf, die Person
-  tritt nach vorn (Foto, Video)
+* `fokus` — die Person tritt groß nach vorn, die Bühne dahinter wird
+  unscharf und läuft weiter (Foto, Video)
 
 ## Die drei Häute
 
@@ -61,9 +61,12 @@ entscheiden.
 | Akzent | Gold | Blau | Violett |
 | Knöpfe | gesperrt, versal | eckig | Pille mit Schein |
 
-Die Bühne im Konfigurator bleibt in allen drei Welten dunkel — Licht liest
-sich nur vor Dunkel. Was sich ändert, sind die **Farben der Strahlen**
-(`WELTEN.<id>.strahlen`) und der Grundton der Fläche (`flaeche`).
+**Die Bühne wechselt mit.** Jede Welt bringt in `WELTEN.<id>.szene` ihre
+eigenen Materialfarben mit — Wand, Boden, Metall, Publikum und die
+Deckkraft der Lichtstrahlen. Hochzeit ist die einzige helle Bühne: der Saal
+ist creme, und das Licht arbeitet als warme Fläche statt als Strahl im
+Dunkeln (`strahlBreit: .30` statt `.16`). Wer eine Welt umfärbt, ändert nur
+diesen Block — `scene.js` liest alles über `F`.
 
 ## Bilder
 
@@ -75,12 +78,40 @@ für ein Foto) und passt zur Bühne, die ebenfalls flach ist.
 Sobald echte Aufnahmen da sind: `bild()` in `seite.js` durch `<img>`
 ersetzen, die Motiv-Namen bleiben als Sortierung nützlich.
 
-## Tiefenschärfe im Fokusschritt
+## Der Fokusschritt
 
 `#lTiefe` trägt alles, was unscharf werden darf, `#lFokus` liegt davor.
 Der Weichzeichner ist ein CSS-`filter` in Bildschirm-Pixeln — er bleibt
-also gleich stark, egal wie weit die Kamera herausgefahren ist, und die
-SMIL-Animationen darunter laufen weiter.
+also gleich stark, egal wie weit die Kamera steht, und die SMIL-Animationen
+darunter laufen weiter.
+
+Allein steht die Person sehr nah im Bild, Oberkörper aufwärts. Kommt die
+zweite dazu, tritt die Kamera einen Schritt zurück und die neue **schiebt
+sich von der Seite herein** — wer schon da war, bleibt stehen.
+`setzeFokus()` merkt sich dafür in `fokusVorher`, wer zuletzt im Bild war.
+
+## Korb
+
+`js/korb.js` hält die Auswahl in `localStorage`, pro Welt getrennt
+(`11event.korb.<welt>`), in derselben Form, die der Konfigurator führt:
+`{ kategorie: leistungsId }`.
+
+Dadurch funktioniert die Bibliothek als Warenkorb: Was dort mit
+**Hinzufügen** eingesammelt wird, ist im Konfigurator schon ausgewählt —
+und was der Konfigurator ändert, steht danach wieder in der Bibliothek.
+Beim Laden wirft `Korb.laden()` alles weg, was es nicht mehr gibt oder was
+in dieser Welt nicht gilt; sonst hinge nach einer Katalogänderung eine
+Leiche im Korb.
+
+## Bibliothek
+
+Oben ein **Gruppenwähler**, darunter immer nur eine Kategorie. Ein Klick auf
+eine Karte öffnet die **volle Vorschau über der Seite** — mit ‹ › zum
+Weiterblättern innerhalb der Gruppe, ohne zurückzuspringen. Der Anker
+(`#dj/dj-marco`) macht sie verlinkbar.
+
+`service.html` gibt es weiterhin für direkte Links von außen; die Bibliothek
+selbst benutzt es nicht mehr.
 
 ## Noch offen
 

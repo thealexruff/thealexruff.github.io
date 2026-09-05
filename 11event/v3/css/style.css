@@ -94,7 +94,7 @@ body{line-height:1.5}
   top:var(--kopf-h);left:0;right:0;
   height:var(--flaeche-h);
   z-index:0;
-  background:var(--buehne-grund,#07070C);
+  background:#07070C;   /* wird von app.js auf die Welt gesetzt */
   overflow:hidden;
 }
 .buehne__platz{height:var(--flaeche-h)}
@@ -474,4 +474,33 @@ body{line-height:1.5}
   .wahl{padding:14px 44px 16px}
   .klang{padding:0 44px}
   .kopf{padding:0 44px}
+}
+
+/* ------------------------------------------------------------------
+   Helle Bühne (Hochzeit): die Bedienelemente liegen auf Creme statt
+   auf Schwarz und drehen sich entsprechend um.
+   ------------------------------------------------------------------ */
+body[data-welt="wedding"] .ton{
+  border-color:rgba(43,36,32,.16);
+  background:rgba(253,251,247,.72);
+  color:#3B322A;
+}
+body[data-welt="wedding"] .ton[data-aus="true"]{
+  color:rgba(59,50,42,.5);border-color:rgba(43,36,32,.12);
+}
+body[data-welt="wedding"] .pfeil{
+  border-color:rgba(43,36,32,.16);
+  background:rgba(253,251,247,.78);
+  color:#3B322A;
+}
+body[data-welt="wedding"] .wischhinweis{
+  color:rgba(59,50,42,.72);
+  background:rgba(253,251,247,.7);
+}
+body[data-welt="wedding"] .punkt{background:rgba(43,36,32,.28)}
+body[data-welt="wedding"] .punkt[aria-current="true"]{background:var(--akzent)}
+
+/* Das Blatt braucht auf hellem Grund eine Kante statt eines Schattens */
+body[data-welt="wedding"] .blatt{
+  box-shadow:0 -1px 0 var(--linie), 0 -18px 40px rgba(43,36,32,.07);
 }

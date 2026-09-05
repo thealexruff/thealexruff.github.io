@@ -223,3 +223,100 @@ body[data-welt="wedding"] .zeichen{
   .kommt{opacity:1;transform:none}
   .glut i{animation:none!important}
 }
+
+/* ==================================================================
+   Bibliothek: Gruppenwahl statt einer endlosen Liste
+   ================================================================== */
+.waehler{
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  padding:6px;margin-bottom:30px;
+  border:var(--karte-rand);border-radius:var(--r-knopf);
+  background:var(--flaeche);width:fit-content;max-width:100%;
+}
+.waehler::-webkit-scrollbar{display:none}
+body[data-welt="corporate"] .waehler{border-radius:12px}
+.waehler button{
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  border:0;background:none;cursor:pointer;
+  padding:10px 16px;border-radius:var(--r-knopf);
+  font-size:14px;font-weight:600;color:var(--leise);
+  transition:background .2s ease,color .2s ease;
+}
+body[data-welt="corporate"] .waehler button{border-radius:8px}
+body[data-welt="wedding"] .waehler button{
+  font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+}
+.waehler button small{
+  font-size:11px;font-weight:600;opacity:.6;
+  padding:1px 6px;border-radius:999px;background:color-mix(in srgb,var(--ink) 9%,transparent);
+}
+.waehler button[aria-pressed="true"]{
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+}
+.waehler button[aria-pressed="true"] small{background:rgba(255,255,255,.22);opacity:.9}
+
+/* Karte: Fläche zum Öffnen, Zeile zum Hinzufügen */
+.karte__flaeche{
+  display:flex;flex-direction:column;flex:1;text-align:left;
+  border:0;background:none;padding:0;cursor:pointer;font:inherit;color:inherit;
+}
+.karte__satz{margin-top:8px;color:var(--leise);font-size:14.5px}
+.karte__aktion{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--linie);
+}
+.karte__aktion .preisz{margin:0}
+
+/* ==================================================================
+   Vollbild-Vorschau
+   ================================================================== */
+body.voll-offen{overflow:hidden}
+.voll{
+  position:fixed;inset:0;z-index:80;
+  background:var(--bg);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .3s ease,transform .3s var(--weich),visibility .3s;
+}
+.voll[data-offen="true"]{opacity:1;visibility:visible;transform:none}
+
+.voll__leiste{
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:center;gap:14px;
+  padding:12px 18px;
+  border-bottom:1px solid var(--linie);
+  background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.voll__zu,.voll__pfeile button{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;flex:none;
+  border:1px solid var(--linie);border-radius:var(--knopf-radius);
+  background:none;cursor:pointer;color:var(--ink);
+}
+.voll__zu svg,.voll__pfeile button svg{width:19px;height:19px}
+.voll__pfeile{display:flex;gap:8px;margin-left:auto}
+.voll__pfeile button:disabled{opacity:.3;cursor:default}
+.voll__zaehler{
+  font-size:12px;font-weight:600;letter-spacing:var(--hut-sperr);
+  text-transform:uppercase;color:var(--leise);
+}
+.voll__inhalt{max-width:1100px;margin:0 auto;padding:34px 20px 70px}
+.voll__kopf h1{font-size:clamp(30px,7vw,54px);margin-top:10px}
+@media (min-width:760px){ .voll__inhalt{padding:48px 28px 80px} }
+
+/* ==================================================================
+   Korbleiste auf den Seiten
+   ================================================================== */
+.korbBar{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;
+  display:flex;align-items:center;gap:14px;
+  padding:12px 18px calc(12px + var(--sicher));
+  border-top:1px solid var(--linie);
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.korbBar__text{flex:1;font-size:14px;font-weight:600}
+.korbBar__text small{display:block;font-weight:400;font-size:12px;color:var(--leise)}
+body.voll-offen .korbBar{z-index:90}

@@ -39,6 +39,10 @@ const zustand = {
   formular: { name:'', mail:'', datum:'', ort:'', gaeste:'', text:'' }
 };
 
+/* Jede Änderung wandert sofort in den Korb — auch beim Verlassen
+   der Seite bleibt so alles stehen. */
+function merken() { Korb.speichern(WELT_ID, zustand.wahl); }
+
 /* Pflichtkategorien starten auf ihrer ersten (kostenlosen) Stufe */
 function grundausstattung() {
   KATS.forEach(k => {
@@ -49,7 +53,9 @@ function grundausstattung() {
   });
 }
 
-const szene = new Szene($('#szene'), WELT.flaeche);
+/* Die Fläche nimmt den Grundton der Welt an — bei Hochzeiten hell. */
+$('#buehne').style.background = WELT.szene.wand;
+const szene = new Szene($('#szene'));
 const djListe = () => leistungen('dj', WELT_ID);
 
 /* ------------------------------------------------------------------
@@ -319,9 +325,15 @@ function szeneAktualisieren(sofort = false) {
   const s  = SCHRITTE[zustand.schritt];
   const imFokus = s.kat && s.kat.schritt === 'fokus';
 
-  /* Im Fokus fährt die Kamera weiter heraus, damit die Person davor Platz hat */
-  const sicht = st ? st.sicht + (sk && sk.hoehe ? sk.hoehe : 0) + (imFokus ? 210 : 0) : 560;
-  szene.setzeKamera(szene.rahmen(sicht, 0, imFokus ? -120 : -194, 0.52, st ? 700 : 540), sofort);
+  if (imFokus) {
+    /* Nah dran: die Person füllt das Bild, die Bühne steht unscharf
+       dahinter. Zu zweit einen Schritt zurück. */
+    const zweit = !!(zustand.wahl.foto && zustand.wahl.film);
+    szene.setzeKamera(szene.rahmen(zweit ? 1040 : 860, 0, zweit ? -190 : -170, 0.5, 420), sofort);
+    return;
+  }
+  const sicht = st ? st.sicht + (sk && sk.hoehe ? sk.hoehe : 0) : 560;
+  szene.setzeKamera(szene.rahmen(sicht, 0, -194, 0.52, st ? 700 : 540), sofort);
 }
 
 /* ------------------------------------------------------------------
@@ -370,6 +382,7 @@ function waehleDj(id) {
   zustand.djIndex = i;
   zustand.karussell = false;
   grundausstattung();
+  merken();
   szene.waehleDj(i);
   szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
   zustand.schritt = 1;
@@ -406,12 +419,12 @@ function schrittSetzen(n) {
 function waehleStufe(kat, id) {
   if (zustand.wahl[kat] === id) return;
   zustand.wahl[kat] = id;
-  rigNeu(); zeichnen();
+  merken(); rigNeu(); zeichnen();
 }
 
 function waehlePerson(kat, id) {
   zustand.wahl[kat] = (zustand.wahl[kat] === id) ? null : id;
-  rigNeu(); zeichnen();
+  merken(); rigNeu(); zeichnen();
 }
 
 function entferne(art) {
@@ -419,6 +432,7 @@ function entferne(art) {
   if (!k) return;
   if (art === 'dj') {
     zustand.wahl = {};
+    merken();
     schrittSetzen(0);
   } else if (k.pflicht) {
     waehleStufe(art, leistungen(art, WELT_ID)[0].id);
@@ -558,16 +572,22 @@ $('#korbTitel').textContent = WELT.anrede;
 
 szene.baueDjs(djListe(), 0);
 
-/* Aus der Bibliothek kommend: ?w=<id> wählt gleich vor */
-const mitbringsel = leistung(new URLSearchParams(location.search).get('w'));
-if (mitbringsel && gilt(mitbringsel, WELT_ID)) {
-  if (mitbringsel.kat === 'dj') waehleDj(mitbringsel.id);
-  else {
-    const ersterDj = djListe()[0];
-    zustand.wahl[mitbringsel.kat] = mitbringsel.id;
-    if (ersterDj) { /* ohne DJ ergibt die Bühne keinen Sinn */ }
-    zustand.schritt = SCHRITTE.findIndex(s => s.id === mitbringsel.kat);
-  }
+/* Was in der Bibliothek schon eingesammelt wurde, steht hier bereit. */
+zustand.wahl = Korb.laden(WELT_ID);
+
+if (zustand.wahl.dj) {
+  /* Mit DJ im Korb überspringen wir die Auswahl und bauen gleich auf. */
+  const i = djListe().findIndex(d => d.id === zustand.wahl.dj);
+  zustand.djIndex = Math.max(0, i);
+  zustand.karussell = false;
+  grundausstattung();
+  szene.waehleDj(zustand.djIndex);
+  szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
+  /* Auf den ersten Schritt, der noch offen ist */
+  const offen = SCHRITTE.findIndex(s => s.kat && !s.kat.pflicht && s.kat.id !== 'dj'
+                                     && !zustand.wahl[s.kat.id]);
+  zustand.schritt = offen > 0 ? offen : 1;
+  rigNeu();
 }
 
 navPunkte();

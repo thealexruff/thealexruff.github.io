@@ -300,8 +300,8 @@ body[data-welt="wedding"] .leuchtschrift{
    also gleich, egal wie weit die Kamera herausgefahren ist.
    ------------------------------------------------------------------ */
 #lTiefe{transition:filter .55s var(--weich),opacity .55s ease}
-#lTiefe.unscharf{filter:blur(5px) saturate(.85);opacity:.72}
-@media (max-width:520px){ #lTiefe.unscharf{filter:blur(3.5px) saturate(.85)} }
+#lTiefe.unscharf{filter:blur(9px) saturate(.8);opacity:.62}
+@media (max-width:520px){ #lTiefe.unscharf{filter:blur(6px) saturate(.8)} }
 
 .fokusfigur{
   animation:tritt-vor .5s cubic-bezier(.2,1.1,.4,1) both;
@@ -309,6 +309,12 @@ body[data-welt="wedding"] .leuchtschrift{
 }
 @keyframes tritt-vor{
   from{opacity:0;transform:translateY(46px) scale(.94)}
+  to{opacity:1}
+}
+/* Der zweite kommt nicht von unten, sondern von der Seite herein */
+.fokusfigur.schiebt{animation-name:schiebt-rein;animation-duration:.62s}
+@keyframes schiebt-rein{
+  from{opacity:0;transform:translateX(calc(var(--seite,1) * 420px))}
   to{opacity:1}
 }
 @media (prefers-reduced-motion:reduce){

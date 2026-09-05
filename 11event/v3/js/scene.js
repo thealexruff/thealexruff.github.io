@@ -12,8 +12,15 @@ const RUHIG = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* Farben der Lichtstrahlen. Hängt an der Welt: Party bunt, Hochzeit warm. */
 let STRAHLFARBEN = WELTEN.private.strahlen;
+
+/* Materialfarben der Bühne. Bei Hochzeiten ist der Saal hell — dann
+   arbeitet das Licht als warme Fläche statt als Strahl im Dunkeln. */
+let F = WELTEN.private.szene;
+
 function setzeWeltFarben(welt) {
-  STRAHLFARBEN = (WELTEN[welt] || WELTEN.private).strahlen;
+  const w = WELTEN[welt] || WELTEN.private;
+  STRAHLFARBEN = w.strahlen;
+  F = w.szene;
 }
 
 const TRAV_Y   = -520;   /* Unterkante Traverse   */
@@ -66,7 +73,7 @@ function figur(dj) {
   const s = [];
 
   /* Schatten am Boden */
-  s.push(`<ellipse cx="0" cy="2" rx="84" ry="13" fill="#000" opacity=".4"/>`);
+  s.push(`<ellipse cx="0" cy="2" rx="84" ry="13" fill="#000" opacity="${F.strahlBreit > .2 ? .12 : .4}"/>`);
 
   /* Beine + Schuhe */
   s.push(`<rect x="-38" y="-134" width="28" height="134" rx="7" fill="${L.hose}"/>`);
@@ -149,16 +156,16 @@ function portraetSVG(dj) {
 /* DJ-Pult, steht vor der Figur */
 function pult(L) {
   return `
-    <circle cx="-96" cy="-156" r="35" fill="#1B1F29"/>
+    <circle cx="-96" cy="-156" r="35" fill="${F.pultTief}"/>
     <circle cx="-96" cy="-156" r="13" fill="${L.akzent}"/>
-    <circle cx="96"  cy="-156" r="35" fill="#1B1F29"/>
+    <circle cx="96"  cy="-156" r="35" fill="${F.pultTief}"/>
     <circle cx="96"  cy="-156" r="13" fill="${L.akzent}"/>
-    <rect x="-32" y="-182" width="64" height="36" rx="6" fill="#1B1F29"/>
+    <rect x="-32" y="-182" width="64" height="36" rx="6" fill="${F.pultTief}"/>
     <rect x="-22" y="-174" width="7" height="20" rx="3.5" fill="${L.akzent}"/>
     <rect x="-6"  y="-174" width="7" height="20" rx="3.5" fill="#3E4657"/>
     <rect x="10"  y="-174" width="7" height="20" rx="3.5" fill="${L.akzent}"/>
-    <rect x="-176" y="-150" width="352" height="16" rx="8" fill="#262B37"/>
-    <rect x="-168" y="-140" width="336" height="140" rx="6" fill="#171A22"/>
+    <rect x="-176" y="-150" width="352" height="16" rx="8" fill="${F.pultTief}"/>
+    <rect x="-168" y="-140" width="336" height="140" rx="6" fill="${F.pult}"/>
     <rect x="-14" y="-96" width="9" height="46" rx="4.5" fill="#F9A163"/>
     <rect x="5"   y="-96" width="9" height="46" rx="4.5" fill="#F9A163"/>`;
 }
@@ -186,17 +193,17 @@ function platz(k, ersterAbstand, luecke) {
 function travStueck() {
   let zack = '';
   zack += `<path d="M 0 6 L ${SEG / 2} ${TRAV_HOCH - 6} L ${SEG} 6"
-             stroke="#2E3444" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+             stroke="${F.metallHell}" stroke-width="6" fill="none" stroke-linecap="round"/>`;
   return `
-    <rect x="0" y="0" width="${SEG + 0.5}" height="8" fill="#3A4152"/>
+    <rect x="0" y="0" width="${SEG + 0.5}" height="8" fill="${F.metall}"/>
     ${zack}
-    <rect x="0" y="${TRAV_HOCH - 8}" width="${SEG + 0.5}" height="8" fill="#3A4152"/>`;
+    <rect x="0" y="${TRAV_HOCH - 8}" width="${SEG + 0.5}" height="8" fill="${F.metall}"/>`;
 }
 
 function turmStueck() {
   return `
-    <rect x="-13" y="0" width="26" height="${-TRAV_Y}" rx="6" fill="#2E3444"/>
-    <rect x="-26" y="${-TRAV_Y - 30}" width="52" height="30" rx="6" fill="#3A4152"/>`;
+    <rect x="-13" y="0" width="26" height="${-TRAV_Y}" rx="6" fill="${F.metallHell}"/>
+    <rect x="-26" y="${-TRAV_Y - 30}" width="52" height="30" rx="6" fill="${F.metall}"/>`;
 }
 
 /* ---------- Movinghead mit Strahl ---------- */
@@ -210,29 +217,29 @@ function kopfStueck(farbe, i) {
                calcMode:'spline', keyTimes:'0;0.5;1',
                keySplines:'0.45 0 0.55 1;0.45 0 0.55 1' })}
       <g class="strahl">
-        <polygon points="0,26 -78,${lang} 78,${lang}" fill="${farbe}" opacity=".16"/>
-        <polygon points="0,26 -26,${lang} 26,${lang}" fill="${farbe}" opacity=".22"/>
+        <polygon points="0,26 -78,${lang} 78,${lang}" fill="${farbe}" opacity="${F.strahlBreit}"/>
+        <polygon points="0,26 -26,${lang} 26,${lang}" fill="${farbe}" opacity="${F.strahlKern}"/>
       </g>
-      <rect x="-13" y="-6" width="26" height="16" rx="4" fill="#2A3040"/>
-      <path d="M -15 8 L 15 8 L 11 40 L -11 40 Z" fill="#353C4D"/>
+      <rect x="-13" y="-6" width="26" height="16" rx="4" fill="${F.dunkel}"/>
+      <path d="M -15 8 L 15 8 L 11 40 L -11 40 Z" fill="${F.metall}"/>
       <ellipse cx="0" cy="40" rx="11" ry="5" fill="${farbe}"/>
     </g>`;
 }
 
 function sunbarStueck(farbe, i) {
   return `
-    <polygon class="strahl" points="-40,-18 40,-18 0,-430" fill="${farbe}" opacity=".16">
-      ${animAttr({ attributeName:'opacity', values:'.07;.2;.07',
+    <polygon class="strahl" points="-40,-18 40,-18 0,-430" fill="${farbe}" opacity="${F.strahlBreit}">
+      ${animAttr({ attributeName:'opacity', values:`${(F.strahlBreit*0.45).toFixed(2)};${(F.strahlBreit*1.3).toFixed(2)};${(F.strahlBreit*0.45).toFixed(2)}`,
                    dur:`${(3.2 + i * 0.7).toFixed(1)}s`, begin:`${-i * 0.9}s` })}
     </polygon>
-    <rect x="-40" y="-22" width="80" height="22" rx="5" fill="#242A36"/>
+    <rect x="-40" y="-22" width="80" height="22" rx="5" fill="${F.dunkel}"/>
     <rect x="-34" y="-17" width="68" height="12" rx="6" fill="${farbe}"/>`;
 }
 
 function tubeStueck(farbe, i) {
   return `
-    <rect class="strahl" x="-22" y="-440" width="44" height="380" rx="22" fill="${farbe}" opacity=".10"/>
-    <rect x="-6" y="-440" width="12" height="380" rx="6" fill="${farbe}" opacity=".85">
+    <rect class="strahl" x="-22" y="-440" width="44" height="380" rx="22" fill="${farbe}" opacity="${(F.strahlBreit*0.7).toFixed(2)}"/>
+    <rect x="-6" y="-440" width="12" height="380" rx="6" fill="${farbe}" opacity="${F.tube}">
       ${animAttr({ attributeName:'opacity', values:'.35;.9;.35',
                    dur:`${(2.4 + i * 0.5).toFixed(1)}s`, begin:`${-i * 0.6}s` })}
     </rect>`;
@@ -259,7 +266,7 @@ function kameraFigur(p, blick) {
   const film = p.kamera === 'film';
   const s = [];
 
-  s.push(`<ellipse cx="0" cy="2" rx="62" ry="10" fill="#000" opacity=".38"/>`);
+  s.push(`<ellipse cx="0" cy="2" rx="62" ry="10" fill="#000" opacity="${F.strahlBreit > .2 ? .12 : .38}"/>`);
   s.push(`<rect x="-30" y="-118" width="24" height="118" rx="6" fill="${L.hose}"/>`);
   s.push(`<rect x="8"   y="-118" width="24" height="118" rx="6" fill="${L.hose}"/>`);
   s.push(`<rect x="-37" y="-15" width="34" height="15" rx="7" fill="${L.schuh}"/>`);
@@ -309,18 +316,18 @@ function kameraFigur(p, blick) {
 function menschStueck(i, skalierung) {
   const dauer = (1.5 + ((i * 13) % 6) * 0.22).toFixed(2);
   const arme = i % 3 === 0
-    ? `<path d="M -44 -180 L -74 -258" stroke="#07080C" stroke-width="22" stroke-linecap="round"/>
-       <path d="M 44 -180 L 76 -262" stroke="#07080C" stroke-width="22" stroke-linecap="round"/>`
-    : `<path d="M -44 -180 L -68 -96" stroke="#07080C" stroke-width="22" stroke-linecap="round"/>
-       <path d="M 44 -180 L 68 -96" stroke="#07080C" stroke-width="22" stroke-linecap="round"/>`;
+    ? `<path d="M -44 -180 L -74 -258" stroke="${F.publikum}" stroke-width="22" stroke-linecap="round"/>
+       <path d="M 44 -180 L 76 -262" stroke="${F.publikum}" stroke-width="22" stroke-linecap="round"/>`
+    : `<path d="M -44 -180 L -68 -96" stroke="${F.publikum}" stroke-width="22" stroke-linecap="round"/>
+       <path d="M 44 -180 L 68 -96" stroke="${F.publikum}" stroke-width="22" stroke-linecap="round"/>`;
   return `
     <g transform="scale(${skalierung})">
       <g>
         ${anim({ type:'translate', values:'0 0;0 -16;0 0', dur:`${dauer}s`,
                  begin:`${-i * 0.31}s`, calcMode:'spline', keyTimes:'0;0.5;1',
                  keySplines:'0.4 0 0.6 1;0.4 0 0.6 1' })}
-        <circle cx="0" cy="-236" r="34" fill="#07080C"/>
-        <path d="M -46 0 L -46 -178 Q -46 -206 0 -206 Q 46 -206 46 -178 L 46 0 Z" fill="#07080C"/>
+        <circle cx="0" cy="-236" r="34" fill="${F.publikum}"/>
+        <path d="M -46 0 L -46 -178 Q -46 -206 0 -206 Q 46 -206 46 -178 L 46 0 Z" fill="${F.publikum}"/>
         ${arme}
       </g>
     </g>`;
@@ -587,13 +594,10 @@ class Szene {
 
     /* Boden und Rückwand einmal und riesig — dann muss nie wieder
        daran gerührt werden, egal wie weit die Kamera herausfährt. */
-    const g = grundfarbe;
     this.lBoden.innerHTML = `
-      <rect x="-6000" y="-4000" width="12000" height="4000" fill="${g}"/>
-      <rect x="-6000" y="0" width="12000" height="3000"
-            fill="${g}" style="filter:brightness(1.45)"/>
-      <rect x="-6000" y="0" width="12000" height="5"
-            fill="${g}" style="filter:brightness(2.2)"/>`;
+      <rect x="-6000" y="-4000" width="12000" height="4000" fill="${F.wand}"/>
+      <rect x="-6000" y="0" width="12000" height="3000" fill="${F.boden}"/>
+      <rect x="-6000" y="0" width="12000" height="5" fill="${F.kante}"/>`;
 
     this.teile = new Map();     /* Schlüssel -> <g class="teil"> */
     this.basis = 0;             /* welcher DJ steht im Karussell bei x = 0 */
@@ -837,23 +841,33 @@ class Szene {
     const an = leute && leute.length;
     this.lTiefe.classList.toggle('unscharf', !!an);
 
-    if (!an) { this.lFokus.innerHTML = ''; return; }
+    if (!an) { this.lFokus.innerHTML = ''; this.fokusVorher = []; return; }
 
-    /* Nebeneinander, wenn zwei da sind */
-    const abstand = leute.length > 1 ? 182 : 0;
+    /* Wer schon stand, bleibt stehen; wer neu dazukommt, schiebt sich
+       von außen ins Bild. */
+    const vorher = this.fokusVorher || [];
+    const zweit  = leute.length > 1;
+
+    /* Allein: sehr nah, Oberkörper aufwärts. Zu zweit: einen Schritt
+       zurück, damit beide hineinpassen. */
+    const gross   = zweit ? 2.15 : 2.75;
+    const tiefe   = zweit ? 300  : 430;      /* wie weit die Beine unten rauslaufen */
+    const abstand = zweit ? 235  : 0;
+
     this.lFokus.innerHTML = leute.map((p, i) => {
-      const x = (i - (leute.length - 1) / 2) * abstand * 2;
-      /* Platzierung außen, Animation innen — sonst überschreibt die
-         Animation die Position. */
-      return `<g transform="translate(${x} 30)">
-                <g class="fokusfigur" style="--v:${(i * 0.12).toFixed(2)}">
-                  <g transform="scale(1.3)">${kameraFigur(p, i === 0 ? 1 : -1)}</g>
+      const x   = (i - (leute.length - 1) / 2) * abstand * 2;
+      const neu = !vorher.includes(p.id);
+      const von = x >= 0 ? 1 : -1;           /* aus welcher Richtung er kommt */
+      return `<g transform="translate(${Math.round(x)} ${tiefe})">
+                <g class="fokusfigur ${neu ? 'schiebt' : ''}"
+                   style="--seite:${von};--v:${(i * 0.06).toFixed(2)}">
+                  <g transform="scale(${gross})">${kameraFigur(p, i === 0 ? 1 : -1)}</g>
                 </g>
               </g>`;
     }).join('');
-  }
 
-  rigAbbauen() { this.abgleichen(new Map()); }
+    this.fokusVorher = leute.map(p => p.id);
+  }
 
   /* Der eigentliche Abgleich */
   abgleichen(wunsch) {
