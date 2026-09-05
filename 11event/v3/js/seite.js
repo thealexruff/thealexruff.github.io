@@ -426,10 +426,16 @@ function vorschauSchliessen() {
 function korbKnoepfe() {
   $$('[data-korb]').forEach(b => {
     const drin = Korb.drin(WELT_ID, b.dataset.korb);
-    b.textContent = drin ? 'Im Korb ✓' : 'Hinzufügen';
+    b.innerHTML = drin
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5.2 5.2L20 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg> Im Korb'
+      : 'Hinzufügen';
     b.classList.toggle('knopf--voll', !drin);
-    b.classList.toggle('knopf--leer', drin);
+    b.classList.toggle('knopf--dabei', drin);
+    b.classList.remove('knopf--leer');
     b.setAttribute('aria-pressed', String(drin));
+    /* Die ganze Karte zeigt es mit, nicht nur der Knopf */
+    const karte = b.closest('.karte');
+    if (karte) karte.dataset.gewaehlt = String(drin);
   });
   korbLeiste();
 }

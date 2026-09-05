@@ -655,30 +655,51 @@ class Szene {
   weltProPixel() { return this.kamera.w / (this.svg.clientWidth || 1); }
 
   /* ---------- DJ-Karussell ----------
-     mitte = der DJ, der bei x = 0 stehen soll. Dadurch bleibt beim
-     Zurückgehen derselbe DJ im Bild und die Kamera schwenkt nicht. */
-  baueDjs(liste, mitte = 0) {
-    this.basis = mitte;
+     Alle DJs stehen an derselben Stelle: mitten auf der Bühne. Gewechselt
+     wird durch Überblenden statt durch Schwenken — deshalb kann alles
+     Gebaute stehen bleiben, während der DJ noch wechselbar ist. */
+  baueDjs(liste, aktiv = 0) {
+    this.djAktiv = aktiv;
     this.lDjs.innerHTML = liste.map((dj, i) => `
-      <g class="dj" data-id="${dj.id}" transform="translate(${(i - mitte) * DJ_LUECKE} 0)">
+      <g class="dj${i === aktiv ? ' dj--an' : ''}" data-id="${dj.id}">
         <g>${figur(dj)}${pult(dj.look)}</g>
       </g>`).join('');
+    this.djs = [...this.lDjs.querySelectorAll('.dj')];
   }
 
-  djX(i) { return (i - this.basis) * DJ_LUECKE; }
+  /* Der alte geht zur Seite, der neue kommt von der anderen herein.
+     richtung  1 = der nächste (kommt von rechts), -1 = der vorige. */
+  zeigeDj(i, richtung = 1) {
+    if (!this.djs || !this.djs[i] || i === this.djAktiv) return;
+    const alt = this.djs[this.djAktiv];
+    const neu = this.djs[i];
+    this.djAktiv = i;
 
-  rahmenFuerDj(i) {
-    return this.rahmen(500, this.djX(i), -170, 0.52, 470);
+    if (alt) {
+      alt.style.setProperty('--seite', -richtung);
+      alt.classList.remove('dj--an', 'dj--rein');
+      alt.classList.add('dj--raus');
+      clearTimeout(alt.__weg);
+      alt.__weg = setTimeout(() => alt.classList.remove('dj--raus'), 420);
+    }
+    neu.style.setProperty('--seite', richtung);
+    neu.classList.remove('dj--raus', 'dj--rein');
+    neu.getBoundingClientRect();          /* Animation neu anstoßen */
+    neu.classList.add('dj--an', 'dj--rein');
+    clearTimeout(neu.__weg);
+    neu.__weg = setTimeout(() => neu.classList.remove('dj--rein'), 480);
   }
 
-  /* Gewählten in die Mitte, Rest raus */
-  waehleDj(index) {
-    [...this.lDjs.querySelectorAll('.dj')].forEach((g, i) => {
-      if (i === index) g.setAttribute('transform', 'translate(0 0)');
-      else g.remove();
-    });
-    this.basis = index;
+  /* Beim Wischen folgt der DJ dem Finger — die Bühne bleibt stehen. */
+  ziehe(dx = 0) {
+    if (!this.lDjs) return;
+    this.lDjs.classList.toggle('zieht', dx !== 0);
+    this.lDjs.style.transform = dx ? `translate(${dx.toFixed(1)}px,0)` : '';
+    this.lDjs.style.opacity   = dx ? String(Math.max(0.35, 1 - Math.abs(dx) / 460)) : '';
   }
+
+  /* Nah am DJ — solange noch nichts drumherum steht */
+  rahmenDj() { return this.rahmen(500, 0, -170, 0.52, 470); }
 
   rahmen(hSicht, mitteX = 0, mitteY = -194, anteil = 0.52, hMin = 700) {
     const cw = this.svg.clientWidth  || 640;
@@ -839,37 +860,76 @@ class Szene {
      Im Foto- und Videoschritt tritt die Person nach vorn, während die
      Bühne dahinter unscharf wird und weiterläuft. Der Weichzeichner
      sitzt auf der ganzen Tiefenebene — die SMIL-Animationen laufen
-     darin einfach weiter. */
-  setzeFokus(leute) {
-    const an = leute && leute.length;
-    this.lTiefe.classList.toggle('unscharf', !!an);
+     darin einfach weiter.
 
-    if (!an) { this.lFokus.innerHTML = ''; this.fokusVorher = []; return; }
+     Gearbeitet wird mit festen Plätzen je Rolle (Foto links, Video
+     rechts), nicht mit einer Liste. Ein Platz, der bleibt, wird nur
+     verschoben und skaliert — er wird nie neu gebaut. Deshalb rutscht
+     die Fotografin sanft zur Seite, wenn der Videograf dazukommt,
+     statt neu einzuspringen.
 
-    /* Wer schon stand, bleibt stehen; wer neu dazukommt, schiebt sich
-       von außen ins Bild. */
-    const vorher = this.fokusVorher || [];
-    const zweit  = leute.length > 1;
+     rollen = [{ rolle:'foto', person }, …]  oder null
+  */
+  setzeFokus(rollen) {
+    const soll = new Map((rollen || []).map(r => [r.rolle, r.person]));
+    this.lTiefe.classList.toggle('unscharf', soll.size > 0);
+    if (!this.fokusPlaetze) this.fokusPlaetze = new Map();
+
+    /* Wer nicht mehr dabei ist, geht zur Seite hinaus */
+    for (const [rolle, platz] of [...this.fokusPlaetze]) {
+      if (soll.has(rolle)) continue;
+      this.fokusPlaetze.delete(rolle);
+      if (RUHIG) { platz.g.remove(); continue; }
+      platz.lauf.classList.remove('fokus--rein');
+      platz.lauf.classList.add('fokus--raus');
+      setTimeout(() => platz.g.remove(), 360);
+    }
+    if (!soll.size) return;
 
     /* Allein: sehr nah, Oberkörper aufwärts. Zu zweit: einen Schritt
        zurück, damit beide hineinpassen. */
+    const zweit   = soll.size > 1;
     const gross   = zweit ? 2.15 : 2.75;
-    const tiefe   = zweit ? 300  : 430;      /* wie weit die Beine unten rauslaufen */
-    const abstand = zweit ? 235  : 0;
+    const tiefe   = zweit ? 300  : 430;
+    const abstand = zweit ? 470  : 0;
+    const liste   = [...soll.keys()];
 
-    this.lFokus.innerHTML = leute.map((p, i) => {
-      const x   = (i - (leute.length - 1) / 2) * abstand * 2;
-      const neu = !vorher.includes(p.id);
-      const von = x >= 0 ? 1 : -1;           /* aus welcher Richtung er kommt */
-      return `<g transform="translate(${Math.round(x)} ${tiefe})">
-                <g class="fokusfigur ${neu ? 'schiebt' : ''}"
-                   style="--seite:${von};--v:${(i * 0.06).toFixed(2)}">
-                  <g transform="scale(${gross})">${kameraFigur(p, i === 0 ? 1 : -1)}</g>
-                </g>
-              </g>`;
-    }).join('');
+    liste.forEach((rolle, i) => {
+      const person = soll.get(rolle);
+      const x      = Math.round((i - (liste.length - 1) / 2) * abstand);
+      const seite  = liste.length === 1 ? 1 : (x >= 0 ? 1 : -1);
+      const blick  = liste.length === 1 ? 1 : (x >= 0 ? -1 : 1);
+      let platz    = this.fokusPlaetze.get(rolle);
 
-    this.fokusVorher = leute.map(p => p.id);
+      if (!platz) {
+        const g = document.createElementNS(SVGNS, 'g');
+        g.setAttribute('class', 'fokusplatz');
+        g.innerHTML = '<g class="fokuslauf"><g class="fokusbild"></g></g>';
+        /* Erst an den Zielplatz setzen, dann hereinlaufen lassen —
+           sonst rutscht der Neue quer durchs Bild. */
+        g.style.setProperty('--seite', seite);
+        g.style.transform = `translate(${x}px,${tiefe}px) scale(${gross})`;
+        this.lFokus.appendChild(g);
+        platz = { g, lauf: g.firstElementChild, bild: g.firstElementChild.firstElementChild, id: null };
+        platz.lauf.classList.add('fokus--rein');
+        this.fokusPlaetze.set(rolle, platz);
+      }
+
+      platz.g.style.setProperty('--seite', seite);
+      platz.g.style.transform = `translate(${x}px,${tiefe}px) scale(${gross})`;
+
+      /* Beim Blättern wechselt nur die Zeichnung im selben Platz —
+         der Platz selbst bleibt liegen, also gibt es keinen Sprung. */
+      if (platz.id !== person.id) {
+        platz.id = person.id;
+        platz.bild.innerHTML = kameraFigur(person, blick);
+        if (!RUHIG) {
+          platz.bild.classList.remove('fokus--tausch');
+          platz.bild.getBoundingClientRect();
+          platz.bild.classList.add('fokus--tausch');
+        }
+      }
+    });
   }
 
   /* Der eigentliche Abgleich */

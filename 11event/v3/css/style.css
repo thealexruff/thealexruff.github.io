@@ -41,12 +41,13 @@ body{line-height:1.5}
 }
 
 
+/* Kein Scrollrahmen: der würde die Sprechblase unter den Punkten
+   abschneiden. Sieben Punkte und eine Pille passen auch so. */
 .schritte{
   display:flex;align-items:center;gap:5px;
   list-style:none;margin:0;padding:0;margin-left:auto;
-  overflow-x:auto;scrollbar-width:none;
+  min-width:0;overflow:visible;
 }
-.schritte::-webkit-scrollbar{display:none}
 .kopf__raus{
   display:inline-flex;align-items:center;gap:6px;flex:none;
   margin-left:8px;padding:7px 12px;border-radius:var(--r-knopf);
@@ -99,10 +100,18 @@ body{line-height:1.5}
   opacity:0;pointer-events:none;
   transition:opacity .16s ease,transform .16s ease;
 }
-@media (hover:hover){
-  .schritt:hover:not([aria-current="step"])::after{opacity:.95;transform:translateX(-50%)}
+/* kleiner Zeiger nach oben */
+.schritt::after{
+  box-shadow:0 10px 24px -12px rgba(0,0,0,.7);
+  z-index:2;
 }
-.schritt:focus-visible::after{opacity:.95;transform:translateX(-50%)}
+@media (hover:hover){
+  .schritt:hover::after{opacity:1;transform:translateX(-50%)}
+  .schritt:hover:not([aria-current="step"]):not(:disabled){
+    background:color-mix(in srgb,var(--ink) 45%,transparent);
+  }
+}
+.schritt:focus-visible::after{opacity:1;transform:translateX(-50%)}
 
 .kopf__raus{
   display:inline-flex;align-items:center;gap:6px;flex:none;
@@ -154,12 +163,44 @@ body{line-height:1.5}
   background:rgba(255,255,255,.32);cursor:pointer;transition:all .25s var(--weich);
 }
 .punkt[aria-current="true"]{background:var(--akzent);width:22px;border-radius:4px}
+/* Wer schon gebucht ist, hat einen Ring — auch wenn gerade ein
+   anderer im Bild steht. */
+.punkt[data-gebucht="true"]{
+  background:color-mix(in srgb,var(--akzent) 75%,transparent);
+  box-shadow:0 0 0 2px rgba(255,255,255,.5);
+}
 
 .wischhinweis{
   position:absolute;top:12px;left:50%;transform:translateX(-50%);
   margin:0;font-size:12px;color:rgba(242,241,246,.72);
   background:rgba(10,10,14,.55);padding:4px 12px;border-radius:var(--r-knopf);
   pointer-events:none;
+}
+
+/* ---------- DJ-Wechsel ----------
+   Alle DJs stehen übereinander in der Bühnenmitte; sichtbar ist immer
+   genau einer. Gewechselt wird durch Überblenden, damit alles Gebaute
+   stehen bleiben kann. */
+#lDjs{transition:transform .32s var(--weich),opacity .32s ease}
+#lDjs.zieht{transition:none}
+.dj{opacity:0;visibility:hidden;pointer-events:none}
+.dj--an{opacity:1;visibility:visible}
+.dj--rein{animation:dj-rein .42s var(--weich) both}
+.dj--raus{
+  visibility:visible;
+  animation:dj-raus .3s ease-in both;
+}
+@keyframes dj-rein{
+  from{opacity:0;transform:translateX(calc(var(--seite,1) * 190px)) scale(.96)}
+  to{opacity:1;transform:none}
+}
+@keyframes dj-raus{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateX(calc(var(--seite,1) * 190px)) scale(.96)}
+}
+@media (prefers-reduced-motion:reduce){
+  .dj--rein,.dj--raus{animation:none}
+  #lDjs{transition:none}
 }
 
 /* Aufbau: --v ist die Verzögerung in Sekunden.
@@ -280,6 +321,22 @@ body{line-height:1.5}
   padding:15px 16px;
 }
 .karte__kopf{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
+/* Was schon dabei ist, sagt es auch — nicht nur durch eine Tönung */
+.karte[data-gewaehlt="true"]{
+  border-color:color-mix(in srgb,var(--akzent) 45%,transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--akzent) 22%,transparent),
+             0 14px 40px -22px var(--glut);
+}
+.dabei{
+  display:inline-flex;align-items:center;gap:4px;vertical-align:middle;
+  margin-left:8px;padding:3px 9px 3px 7px;border-radius:999px;
+  background:color-mix(in srgb,var(--akzent) 15%,transparent);
+  border:1px solid color-mix(in srgb,var(--akzent) 42%,transparent);
+  color:var(--akzent);
+  font-size:10px;font-weight:700;letter-spacing:.08em;line-height:1;
+  text-transform:uppercase;
+}
+.dabei svg{width:10px;height:10px;flex:none}
 .hut{
   display:block;font-size:11px;font-weight:600;letter-spacing:.09em;
   text-transform:uppercase;color:var(--akzent-2);margin-bottom:5px;
@@ -336,15 +393,31 @@ body{line-height:1.5}
   border:1px solid var(--linie);background:var(--flaeche-hoch);
   cursor:pointer;transition:border-color .2s ease,background .2s ease;
 }
+.groesse{position:relative}
+/* Der Haken sitzt vor dem Preis — dort ist immer Platz, anders als
+   in der Ecke, wo er auf langen Namen wie "Blüten" liegen würde. */
+.groesse__preis{display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.groesse__haken{
+  display:none;flex:none;
+  width:15px;height:15px;place-items:center;
+  border-radius:50%;background:var(--akzent);color:var(--auf-akzent);
+}
+.groesse__haken svg{width:9px;height:9px}
+.groesse[aria-pressed="true"] .groesse__haken{display:grid}
 .groesse b{font-size:21px;font-weight:600;line-height:1.05}
 .groesse small{font-size:11px;color:var(--leise);text-align:center;line-height:1.2}
-.groesse span{font-size:13px;font-weight:600;color:var(--akzent-2);margin-top:2px}
+.groesse__preis{font-size:13px;font-weight:600;color:var(--akzent-2);margin-top:2px}
 .groesse[aria-pressed="true"]{
   border-color:color-mix(in srgb,var(--akzent) 70%,transparent);
   background:color-mix(in srgb,var(--akzent) 12%,transparent);
   box-shadow:0 8px 26px -12px var(--glut);
 }
+.groesse[aria-pressed="true"]{
+  border-width:2px;padding:9px 5px;
+  border-color:var(--akzent);
+}
 .groesse[aria-pressed="true"] b{color:var(--ink)}
+.groesse[aria-pressed="true"] .groesse__preis{color:var(--akzent)}
 
 .daten{
   display:grid;grid-template-columns:1fr 1fr;gap:0 18px;

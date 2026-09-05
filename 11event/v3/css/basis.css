@@ -255,6 +255,16 @@ body[data-welt="private"] .knopf--leer{
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
 }
 body[data-welt="wedding"] .knopf--leer{background:transparent}
+/* Liegt schon im Korb — sichtbar anders als "kann noch dazu" */
+.knopf--dabei{
+  background:color-mix(in srgb,var(--akzent) 14%,transparent);
+  border:1px solid var(--akzent);
+  color:var(--akzent);
+}
+.knopf--dabei svg{width:14px;height:14px;flex:none}
+@media (hover:hover){
+  .knopf--dabei:hover{background:color-mix(in srgb,var(--akzent) 22%,transparent)}
+}
 .knopf--klein{padding:9px 16px;font-size:13.5px}
 body[data-welt="wedding"] .knopf--klein{padding:10px 18px;font-size:11px}
 .knopf:disabled{opacity:.45;cursor:default;box-shadow:none}
@@ -303,21 +313,35 @@ body[data-welt="wedding"] .leuchtschrift{
 #lTiefe.unscharf{filter:blur(9px) saturate(.8);opacity:.62}
 @media (max-width:520px){ #lTiefe.unscharf{filter:blur(6px) saturate(.8)} }
 
-.fokusfigur{
-  animation:tritt-vor .5s cubic-bezier(.2,1.1,.4,1) both;
-  animation-delay:calc(var(--v,0) * 1s);
+/* Foto und Video stehen auf festen Plätzen: die Fotografin links, der
+   Videograf rechts. Der Platz wird verschoben und skaliert, nie neu
+   gebaut — kommt einer dazu, rückt der andere sanft zur Seite, statt
+   neu einzuspringen. */
+.fokusplatz{
+  transform-box:view-box;transform-origin:0 0;
+  transition:transform .55s var(--weich);
 }
-@keyframes tritt-vor{
-  from{opacity:0;transform:translateY(46px) scale(.94)}
-  to{opacity:1}
+.fokuslauf,.fokusbild{transform-box:view-box;transform-origin:0 0}
+
+.fokuslauf.fokus--rein{animation:fokus-rein .55s cubic-bezier(.2,1.05,.4,1) both}
+.fokuslauf.fokus--raus{animation:fokus-raus .34s ease-in both}
+@keyframes fokus-rein{
+  from{opacity:0;transform:translateX(calc(var(--seite,1) * 210px))}
+  to{opacity:1;transform:none}
 }
-/* Der zweite kommt nicht von unten, sondern von der Seite herein */
-.fokusfigur.schiebt{animation-name:schiebt-rein;animation-duration:.62s}
-@keyframes schiebt-rein{
-  from{opacity:0;transform:translateX(calc(var(--seite,1) * 420px))}
-  to{opacity:1}
+@keyframes fokus-raus{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateX(calc(var(--seite,1) * 210px))}
 }
+/* Beim Blättern wechselt nur die Zeichnung im selben Platz */
+.fokusbild.fokus--tausch{animation:fokus-tausch .34s ease-out both}
+@keyframes fokus-tausch{
+  from{opacity:0;transform:translateX(calc(var(--seite,1) * 26px))}
+  to{opacity:1;transform:none}
+}
+
 @media (prefers-reduced-motion:reduce){
   #lTiefe{transition:none}
-  .fokusfigur{animation:none}
+  .fokusplatz{transition:none}
+  .fokuslauf,.fokusbild{animation:none}
 }

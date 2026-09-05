@@ -26,12 +26,17 @@ const SCHRITTE = [
 ];
 const LETZTER = SCHRITTE.length - 1;
 
+/* Beim DJ wird geblättert, bei Foto und Video auch — nur eben durch
+   Menschen statt durch Auflegende. */
+const artVon = (i) => (SCHRITTE[i].kat ? SCHRITTE[i].kat.schritt : 'anfrage');
+const imDjSchritt = () => artVon(zustand.schritt) === 'karussell';
+const imFokusSchritt = () => artVon(zustand.schritt) === 'fokus';
+
 /* ------------------------------------------------------------------
    Zustand
    ------------------------------------------------------------------ */
 const zustand = {
   schritt: 0,
-  karussell: true,
   djIndex: 0,
   blick: {},        /* Foto/Video: welche Person gerade gezeigt wird */
   wahl: {},         /* Kategorie -> Leistungs-id */
@@ -122,6 +127,11 @@ function schrittleiste() {
 /* ------------------------------------------------------------------
    Auswahlkarten
    ------------------------------------------------------------------ */
+
+/* Ein Haken sagt deutlicher als eine Farbe, dass etwas dabei ist. */
+const HAKEN = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5.2 5.2L20 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const dabeiMarke = (an, wort = 'Gewählt') =>
+  an ? `<span class="dabei">${HAKEN}${wort}</span>` : '';
 function wahlZeichnen() {
   const s = SCHRITTE[zustand.schritt];
   const artDj = s.kat && s.kat.schritt === 'karussell';
@@ -135,10 +145,8 @@ function wahlZeichnen() {
     : s.kat.schritt === 'fokus'  ? wahlLeute(s.kat)
     : '';
 
-  const browse = artDj ? zustand.karussell
-               : (s.kat && s.kat.schritt === 'fokus');
-  $('#szeneNav').hidden     = !browse;
-  $('#wischhinweis').hidden = !artDj || !zustand.karussell;
+  $('#szeneNav').hidden     = !(artDj || imFokusSchritt());
+  $('#wischhinweis').hidden = !artDj;
   navPunkte();
   scrollPruefen();
 }
@@ -158,7 +166,9 @@ function djKarteZeichnen() {
   if (!dj) return;
   const gewaehlt = zustand.wahl.dj === dj.id;
 
-  $('#djHut').textContent   = `DJ · ${zustand.djIndex + 1} von ${liste.length}`;
+  $('#djHut').innerHTML = `DJ · ${zustand.djIndex + 1} von ${liste.length}`
+    + dabeiMarke(gewaehlt, 'Gebucht');
+  $('#djBlock').querySelector('.karte').dataset.gewaehlt = String(gewaehlt);
   $('#djName').textContent  = dj.name;
   $('#djStil').textContent  = dj.stil;
   $('#djPreis').textContent = euro(dj.preis);
@@ -188,7 +198,7 @@ function wahlStufen(k) {
     <div class="karte">
       <div class="karte__kopf">
         <div>
-          <span class="hut">${k.name}</span>
+          <span class="hut">${k.name}${dabeiMarke(!!gew && !gew.inklusive)}</span>
           <h1 class="karte__titel">${k.frage}</h1>
         </div>
         ${weiterKnopf(i)}
@@ -200,7 +210,10 @@ function wahlStufen(k) {
                   aria-pressed="${zustand.wahl[k.id] === l.id}">
             <b>${l.stufe}</b>
             <small>${l.groesse}</small>
-            <span>${l.inklusive ? 'inklusive' : euro(l.preis)}</span>
+            <span class="groesse__preis">
+              <span class="groesse__haken" aria-hidden="true">${HAKEN}</span>
+              ${l.inklusive ? 'inklusive' : euro(l.preis)}
+            </span>
           </button>`).join('')}
       </div>
 
@@ -237,10 +250,10 @@ function wahlLeute(k) {
   const dran  = gew && blick && gew.id === blick.id;
 
   return `
-    <div class="karte">
+    <div class="karte" data-gewaehlt="${!!dran}">
       <div class="karte__kopf">
         <div>
-          <span class="hut">${k.name} · ${(zustand.blick[k.id] || 0) + 1} von ${liste.length}</span>
+          <span class="hut">${k.name} · ${(zustand.blick[k.id] || 0) + 1} von ${liste.length}${dabeiMarke(dran, 'Gebucht')}</span>
           <h1 class="karte__titel">${blick.name}</h1>
           <p class="karte__stil">${blick.stil}</p>
           <p class="karte__preiszeile">${euro(blick.preis)}<small> / ${blick.einheit}</small></p>
@@ -249,9 +262,9 @@ function wahlLeute(k) {
       </div>
 
       <div class="karte__fuss">
-        <button class="knopf ${dran ? 'knopf--leer' : 'knopf--voll'}" type="button"
-                data-person="${k.id}" data-id="${blick.id}">
-          ${dran ? 'Wieder abwählen' : `${blick.name} dazunehmen`}
+        <button class="knopf ${dran ? 'knopf--dabei' : 'knopf--voll'}" type="button"
+                data-person="${k.id}" data-id="${blick.id}" aria-pressed="${!!dran}">
+          ${dran ? `${HAKEN} Dabei — wieder abwählen` : `${blick.name} dazunehmen`}
         </button>
       </div>
 
@@ -298,6 +311,22 @@ function wahlAnfrage() {
 /* ------------------------------------------------------------------
    Szene
    ------------------------------------------------------------------ */
+
+/* Wer im Fokusschritt vorn steht: die Person, die man gerade ansieht,
+   plus die aus der anderen Kategorie, die schon gebucht ist. Die
+   Reihenfolge hängt an der Rolle, nicht am Schritt — nur so bleibt
+   die Fotografin stehen, während der Videograf hereinkommt. */
+function fokusRollen() {
+  const s = SCHRITTE[zustand.schritt];
+  if (!imFokusSchritt()) return [];
+  return KATS.filter(k => k.schritt === 'fokus').map(k => {
+    const person = k.id === s.kat.id
+      ? leistungen(k.id, WELT_ID)[zustand.blick[k.id] || 0]
+      : leistung(zustand.wahl[k.id]);
+    return person ? { rolle:k.id, person } : null;
+  }).filter(Boolean);
+}
+
 function rigNeu() {
   const s = SCHRITTE[zustand.schritt];
   const imFokus = s.kat && s.kat.schritt === 'fokus';
@@ -313,35 +342,33 @@ function rigNeu() {
 
   if (!imFokus) { szene.setzeFokus(null); return; }
 
-  /* Im Fokusschritt steht die gerade gezeigte Person vorn — dazu,
-     wer aus der anderen Kategorie schon gebucht ist. */
-  const liste  = leistungen(s.kat.id, WELT_ID);
-  const zeigen = [liste[zustand.blick[s.kat.id] || 0]];
-  const andere = s.kat.id === 'foto' ? 'film' : 'foto';
-  const dazu   = leistung(zustand.wahl[andere]);
-  if (dazu) zeigen.push(dazu);
-  szene.setzeFokus(zeigen);
+  /* Im Fokusschritt steht die gerade gezeigte Person vorn — dazu, wer
+     aus der anderen Kategorie schon gebucht ist. Die Reihenfolge hängt
+     an der Rolle, nicht am Schritt: Foto steht immer auf derselben
+     Seite wie vorher, Video auf seiner. Nur so kann der eine stehen
+     bleiben, während der andere hereinkommt. */
+  szene.setzeFokus(fokusRollen());
 }
 
 function szeneAktualisieren(sofort = false) {
-  if (zustand.karussell) {
-    szene.setzeKamera(szene.rahmenFuerDj(zustand.djIndex), sofort);
-    return;
-  }
   const st = leistung(zustand.wahl.stage);
   const sk = leistung(zustand.wahl.skin);
-  const s  = SCHRITTE[zustand.schritt];
-  const imFokus = s.kat && s.kat.schritt === 'fokus';
+  const imFokus = imFokusSchritt();
+
+  /* Solange noch nichts steht, ist die Kamera nah am DJ. Sobald eine
+     Bühne gewählt ist, bleibt sie auch beim DJ-Wechsel im Bild. */
+  if (!st) { szene.setzeKamera(szene.rahmenDj(), sofort); return; }
 
   if (imFokus) {
     /* Nah dran: die Person füllt das Bild, die Bühne steht unscharf
-       dahinter. Zu zweit einen Schritt zurück. */
-    const zweit = !!(zustand.wahl.foto && zustand.wahl.film);
+       dahinter. Sobald zwei vorn stehen, einen Schritt zurück — und
+       zwar nach derselben Regel, nach der die Szene sie hinstellt. */
+    const zweit = fokusRollen().length > 1;
     szene.setzeKamera(szene.rahmen(zweit ? 1040 : 860, 0, zweit ? -190 : -170, 0.5, 420), sofort);
     return;
   }
-  const sicht = st ? st.sicht + (sk && sk.hoehe ? sk.hoehe : 0) : 560;
-  szene.setzeKamera(szene.rahmen(sicht, 0, -194, 0.52, st ? 700 : 540), sofort);
+  const sicht = st.sicht + (sk && sk.hoehe ? sk.hoehe : 0);
+  szene.setzeKamera(szene.rahmen(sicht, 0, -194, 0.52, 700), sofort);
 }
 
 /* ------------------------------------------------------------------
@@ -353,13 +380,16 @@ function zeichnen(sofort = false) {
 
 function navPunkte() {
   const s = SCHRITTE[zustand.schritt];
-  const imFokus = s.kat && s.kat.schritt === 'fokus';
+  const imFokus = imFokusSchritt();
   const liste = imFokus ? leistungen(s.kat.id, WELT_ID) : djListe();
   const jetzt = imFokus ? (zustand.blick[s.kat.id] || 0) : zustand.djIndex;
 
+  const gebucht = (l) => imFokus ? zustand.wahl[s.kat.id] === l.id
+                                 : zustand.wahl.dj === l.id;
   $('#punkte').innerHTML = liste.map((l, i) =>
     `<button class="punkt" type="button" data-punkt="${i}"
-             aria-label="${l.name}" aria-current="${i === jetzt}"></button>`).join('');
+             aria-label="${l.name}" data-gebucht="${gebucht(l)}"
+             aria-current="${i === jetzt}"></button>`).join('');
   $('#pfeilLinks').disabled  = jetzt === 0;
   $('#pfeilRechts').disabled = jetzt === liste.length - 1;
 }
@@ -367,9 +397,8 @@ function navPunkte() {
 /* Blättern — im DJ-Schritt durch die DJs, im Fokus durch die Leute */
 function blaettern(i) {
   const s = SCHRITTE[zustand.schritt];
-  const imFokus = s.kat && s.kat.schritt === 'fokus';
 
-  if (imFokus) {
+  if (imFokusSchritt()) {
     const liste = leistungen(s.kat.id, WELT_ID);
     zustand.blick[s.kat.id] = Math.max(0, Math.min(liste.length - 1, i));
     wahlZeichnen(); rigNeu();
@@ -378,50 +407,37 @@ function blaettern(i) {
   const liste = djListe();
   const neu = Math.max(0, Math.min(liste.length - 1, i));
   const wechsel = neu !== zustand.djIndex;
+  const richtung = neu > zustand.djIndex ? 1 : -1;
   zustand.djIndex = neu;
-  navPunkte(); wahlZeichnen(); szeneAktualisieren();
+  /* Der DJ wird an Ort und Stelle getauscht — die Bühne bleibt stehen */
+  szene.ziehe(0);
+  if (wechsel) szene.zeigeDj(neu, richtung);
+  navPunkte(); wahlZeichnen();
   if (wechsel) Klang.zeigen(liste[neu], true);
 }
 
 function waehleDj(id) {
   const liste = djListe();
   const i = liste.findIndex(d => d.id === id);
+  const neu = zustand.wahl.dj !== id;
   zustand.wahl.dj = id;
   zustand.djIndex = i;
-  zustand.karussell = false;
   grundausstattung();
   merken();
-  szene.waehleDj(i);
-  szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
+  /* Beim allerersten Mal fährt die Kamera aus der Nahaufnahme heraus,
+     während die Traverse hereinfliegt. Steht die Bühne schon, bleibt
+     sie einfach stehen — dann wird nur weitergegangen. */
   zustand.schritt = 1;
   rigNeu();
-  Klang.zeigen(liste[i], true);
+  if (neu) Klang.zeigen(liste[i], true);
   zeichnen();
-}
-
-function karussellOeffnen() {
-  if (zustand.karussell) { zeichnen(); return; }
-  zustand.karussell = true;
-  szene.setzeFokus(null);
-  szene.rigAbbauen();
-  szene.baueDjs(djListe(), zustand.djIndex);
-  zeichnen();
-}
-
-function karussellSchliessen() {
-  if (!zustand.karussell || !zustand.wahl.dj) return;
-  const i = djListe().findIndex(d => d.id === zustand.wahl.dj);
-  zustand.djIndex = i;
-  zustand.karussell = false;
-  szene.waehleDj(i);
-  szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
-  rigNeu();
 }
 
 function schrittSetzen(n) {
   zustand.schritt = Math.max(0, Math.min(LETZTER, n));
-  if (zustand.schritt === 0) karussellOeffnen();
-  else { karussellSchliessen(); rigNeu(); zeichnen(); }
+  szene.ziehe(0);
+  rigNeu();
+  zeichnen();
 }
 
 function waehleStufe(kat, id) {
@@ -539,28 +555,29 @@ $('#ton').addEventListener('click', () => { Klang.stummSchalten(!Klang.istStumm(
 /* ---------- Wischen ---------- */
 (function wischen() {
   const svg = $('#szene');
-  let aktiv = false, startX = 0, startKamera = 0, bewegt = 0, richtung = 0;
+  let aktiv = false, startX = 0, bewegt = 0, richtung = 0;
 
   svg.addEventListener('pointerdown', (e) => {
-    if (!zustand.karussell) return;
-    aktiv = true; bewegt = 0; startX = e.clientX; startKamera = szene.kamera.x;
+    if (!imDjSchritt()) return;
+    aktiv = true; bewegt = 0; richtung = 0; startX = e.clientX;
     svg.setPointerCapture(e.pointerId); svg.classList.add('greift');
   });
   svg.addEventListener('pointermove', (e) => {
     if (!aktiv) return;
     const dx = e.clientX - startX;
     bewegt = Math.abs(dx); richtung = Math.sign(dx);
-    const halb = szene.kamera.w / 2, grenze = DJ_LUECKE * 0.55;
-    const x = startKamera - dx * szene.weltProPixel();
-    const min = szene.djX(0) - halb - grenze;
-    const max = szene.djX(djListe().length - 1) - halb + grenze;
-    szene.schiebe(Math.max(min, Math.min(max, x)));
+    /* Nur der DJ folgt dem Finger — die Bühne drumherum steht still.
+       Am Anfang und am Ende der Reihe zieht es zäher. */
+    const rand = (richtung > 0 && zustand.djIndex === 0)
+              || (richtung < 0 && zustand.djIndex === djListe().length - 1);
+    szene.ziehe(dx * szene.weltProPixel() * (rand ? 0.28 : 0.8));
   });
   const los = () => {
     if (!aktiv) return;
     aktiv = false; svg.classList.remove('greift');
     const schwelle = (svg.clientWidth || 320) * 0.12;
-    blaettern(bewegt > schwelle ? zustand.djIndex - richtung : zustand.djIndex);
+    if (bewegt > schwelle) blaettern(zustand.djIndex - richtung);
+    else szene.ziehe(0);
   };
   svg.addEventListener('pointerup', los);
   svg.addEventListener('pointercancel', los);
@@ -601,11 +618,12 @@ function zustandAufAuswahlStellen() {
     if (i >= 0) zustand.blick[k.id] = i;
   });
   zustand.schritt = 0;
-  zustand.karussell = true;
   szene.baueDjs(djListe(), zustand.djIndex);
+  /* Was schon im Korb liegt, steht von Anfang an auf der Fläche */
+  rigNeu();
 }
 
 navPunkte();
 zeichnen(true);
-Klang.zeigen(djListe()[0], false);
+Klang.zeigen(djListe()[zustand.djIndex], false);
 tonZeichnen();

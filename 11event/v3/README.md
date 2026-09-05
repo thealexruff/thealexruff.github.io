@@ -85,10 +85,40 @@ Der Weichzeichner ist ein CSS-`filter` in Bildschirm-Pixeln — er bleibt
 also gleich stark, egal wie weit die Kamera steht, und die SMIL-Animationen
 darunter laufen weiter.
 
-Allein steht die Person sehr nah im Bild, Oberkörper aufwärts. Kommt die
-zweite dazu, tritt die Kamera einen Schritt zurück und die neue **schiebt
-sich von der Seite herein** — wer schon da war, bleibt stehen.
-`setzeFokus()` merkt sich dafür in `fokusVorher`, wer zuletzt im Bild war.
+Gearbeitet wird mit **festen Plätzen je Rolle**: Foto links, Video rechts.
+`setzeFokus()` bekommt `[{rolle, person}, …]` und hält die Plätze in
+`fokusPlaetze`. Ein Platz, der bleibt, wird nur verschoben und skaliert —
+er wird nie neu gebaut. Deshalb:
+
+* Allein steht die Person sehr nah im Bild, Oberkörper aufwärts.
+* Kommt die zweite dazu, **schiebt sie sich von der Seite herein**, während
+  die erste sanft zur Seite rückt und kleiner wird (CSS-`transition` auf
+  dem Platz). Die Kamera tritt im selben Zug zurück.
+* Geht sie wieder, **schiebt sie zur Seite hinaus** und die verbliebene
+  gleitet zurück in die Mitte.
+* Beim Blättern innerhalb einer Rolle wechselt nur die Zeichnung im selben
+  Platz (`fokus--tausch`) — der Platz selbst rührt sich nicht.
+
+Kamera und Szene benutzen dieselbe Regel (`fokusRollen()`), sonst stünden
+zwei Leute im Bild, während die Kamera noch auf eine Person gerahmt ist.
+
+## Der DJ-Wechsel
+
+Alle DJs stehen **an derselben Stelle**, mitten auf der Bühne; sichtbar ist
+immer genau einer (`.dj--an`). Gewechselt wird durch Überblenden mit einem
+kurzen Seitwärtsversatz, nicht durch Schwenken der Kamera.
+
+Das ist der Grund, warum im DJ-Schritt alles Gebaute stehen bleiben kann:
+Traverse, Bühnenbild, LED-Wand, Fotografin und Videograf stehen weiter da,
+während der DJ noch wechselbar ist. Früher standen die DJs 900 Einheiten
+auseinander und die Kamera fuhr hin und her — damit war ein Rig, das um
+x = 0 gebaut ist, nicht vereinbar.
+
+Beim Wischen folgt nur `#lDjs` dem Finger (`szene.ziehe()`), die Bühne
+bleibt still. Am Anfang und am Ende der Reihe zieht es zäher.
+
+`rigAbbauen()` gibt es noch, wird aber nur gebraucht, wenn wirklich nichts
+mehr gewählt ist.
 
 ## Korb
 
@@ -132,7 +162,15 @@ liegt. Was gewählt ist, steht dabei bereits markiert bereit:
 * das Karussell öffnet auf dem gebuchten DJ, der Knopf sagt „Weiter mit …",
 * Licht, LED und Bühnenbild zeigen die gewählte Stufe aktiv,
 * Foto und Video öffnen auf der gebuchten Person (`zustand.blick`), nicht
-  auf der ersten — ein Druck auf Weiter bestätigt sie.
+  auf der ersten — ein Druck auf Weiter bestätigt sie,
+* und alles zusammen steht **von Anfang an auf der Fläche**: `rigNeu()`
+  läuft schon beim Start, nicht erst nach der DJ-Bestätigung.
+
+Was gewählt ist, sagt es auch: die Karte bekommt einen Akzentrand
+(`data-gewaehlt`), in der Hutzeile steht eine Marke mit Haken (`.dabei`),
+die gewählte Stufe hat einen Haken vor dem Preis, der gebuchte Mensch
+einen Knopf im Zustand `.knopf--dabei`. In der Bibliothek trägt die ganze
+Karte den Akzent, nicht nur der Knopf.
 
 So läuft man einmal durch und bestätigt, statt mitten im Ablauf zu landen.
 
@@ -156,4 +194,4 @@ selbst benutzt es nicht mehr.
 ## Cache
 
 GitHub Pages cacht vier Stunden. An CSS und JS hängt darum ein `?v=…`.
-**Nach jeder Änderung hochzählen** (`sed -i '' 's/?v=6"/?v=7"/g' */*.html index.html`).
+**Nach jeder Änderung hochzählen** (`sed -i '' 's/?v=18"/?v=19"/g' */*.html index.html`).

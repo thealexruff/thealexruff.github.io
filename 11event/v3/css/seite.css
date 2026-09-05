@@ -102,6 +102,17 @@ body[data-welt="private"] .karte{
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
 @media (hover:hover){ .karte:hover{border-color:var(--linie-stark);transform:translateY(-3px)} }
+/* Was im Korb liegt, sieht man der ganzen Karte an */
+.karte[data-gewaehlt="true"]{
+  border-color:color-mix(in srgb,var(--akzent) 55%,transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--akzent) 25%,transparent),
+             var(--karte-schatten);
+}
+.karte[data-gewaehlt="true"]::after{
+  content:'';position:absolute;left:0;right:0;top:0;height:3px;
+  border-radius:var(--r-gross) var(--r-gross) 0 0;
+  background:linear-gradient(90deg,var(--akzent),var(--akzent-2));
+}
 .karte h3{font-size:19px;margin-bottom:8px}
 body[data-welt="wedding"] .karte h3{font-size:23px}
 .karte p{color:var(--leise);font-size:14.5px}
