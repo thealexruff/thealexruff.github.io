@@ -69,6 +69,8 @@ body{line-height:1.5}
              background .2s ease,color .2s ease;
 }
 .schritt:disabled{opacity:.4;cursor:default}
+/* Der Punkt ist klein, die Trefferfläche nicht */
+.schritt::before{content:'';position:absolute;inset:-10px -5px}
 
 /* Erledigte Schritte sind eingefärbt, kommende bleiben grau */
 .schritt[data-fertig="true"]{background:color-mix(in srgb,var(--akzent) 55%,transparent)}

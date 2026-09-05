@@ -121,7 +121,20 @@ kommende grau. Beim Zeigen (oder per Tastaturfokus) sagt jeder Punkt über
 `data-titel`, wofür er steht. Dasselbe auf Handy und Desktop.
 
 **Zurück gibt es nicht mehr als Knopf** — dafür sind die Punkte da.
-Weiter sitzt oben rechts neben der Überschrift.
+Weiter sitzt oben rechts neben der Überschrift. Die Punkte sind klein,
+ihre Trefferfläche über `::before` aber deutlich größer.
+
+## Einstieg mit vollem Korb
+
+Der Konfigurator startet **immer beim DJ**, auch wenn schon alles im Korb
+liegt. Was gewählt ist, steht dabei bereits markiert bereit:
+
+* das Karussell öffnet auf dem gebuchten DJ, der Knopf sagt „Weiter mit …",
+* Licht, LED und Bühnenbild zeigen die gewählte Stufe aktiv,
+* Foto und Video öffnen auf der gebuchten Person (`zustand.blick`), nicht
+  auf der ersten — ein Druck auf Weiter bestätigt sie.
+
+So läuft man einmal durch und bestätigt, statt mitten im Ablauf zu landen.
 
 ## Bibliothek
 

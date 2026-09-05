@@ -578,27 +578,31 @@ $('#markeLink').href = 'index.html';
 $('#raus').href = 'index.html';
 $('#korbTitel').textContent = WELT.anrede;
 
-szene.baueDjs(djListe(), 0);
-
 /* Was in der Bibliothek eingesammelt wurde, steht hier bereit —
    aus dem Speicher, und falls vorhanden zusätzlich aus der Adresse. */
 zustand.wahl = Korb.laden(WELT_ID);
 const ausLink = Korb.ausAdresse(WELT_ID);
 if (ausLink) { zustand.wahl = { ...zustand.wahl, ...ausLink }; merken(); }
 
-if (zustand.wahl.dj) {
-  /* Mit DJ im Korb überspringen wir die Auswahl und bauen gleich auf. */
-  const i = djListe().findIndex(d => d.id === zustand.wahl.dj);
-  zustand.djIndex = Math.max(0, i);
-  zustand.karussell = false;
-  grundausstattung();
-  szene.waehleDj(zustand.djIndex);
-  szene.setzeKamera(szene.rahmen(500, 0, -170, 0.52, 470), true);
-  /* Auf den ersten Schritt, der noch offen ist */
-  const offen = SCHRITTE.findIndex(s => s.kat && !s.kat.pflicht && s.kat.id !== 'dj'
-                                     && !zustand.wahl[s.kat.id]);
-  zustand.schritt = offen > 0 ? offen : 1;
-  rigNeu();
+/* Angefangen wird immer beim DJ — auch mit vollem Korb. Wer schon
+   etwas gewählt hat, sieht es auf jedem Schritt bereits markiert und
+   bestätigt es einfach mit Weiter. */
+zustandAufAuswahlStellen();
+
+function zustandAufAuswahlStellen() {
+  if (zustand.wahl.dj) {
+    const i = djListe().findIndex(d => d.id === zustand.wahl.dj);
+    if (i >= 0) zustand.djIndex = i;
+  }
+  /* Foto und Video öffnen auf der Person, die schon gebucht ist,
+     statt immer bei der ersten. */
+  KATS.filter(k => k.schritt === 'fokus').forEach(k => {
+    const i = leistungen(k.id, WELT_ID).findIndex(l => l.id === zustand.wahl[k.id]);
+    if (i >= 0) zustand.blick[k.id] = i;
+  });
+  zustand.schritt = 0;
+  zustand.karussell = true;
+  szene.baueDjs(djListe(), zustand.djIndex);
 }
 
 navPunkte();

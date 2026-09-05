@@ -832,6 +832,9 @@ class Szene {
     this.abgleichen(Szene.plan(auswahl));
   }
 
+  /* Alles Gebaute wieder abräumen — beim Zurück zur DJ-Auswahl. */
+  rigAbbauen() { this.abgleichen(new Map()); }
+
   /* ---------- Fokus ----------
      Im Foto- und Videoschritt tritt die Person nach vorn, während die
      Bühne dahinter unscharf wird und weiterläuft. Der Weichzeichner
