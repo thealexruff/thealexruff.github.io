@@ -100,6 +100,9 @@ function korbZeichnen() {
    ------------------------------------------------------------------ */
 const erreichbar = () => (zustand.wahl.dj ? LETZTER : 0);
 
+/* Punkte statt Nummern: der aktuelle Schritt wird zur Pille mit
+   Beschriftung, alle anderen bleiben Punkte auf gleicher Höhe.
+   Beim Zeigen verrät jeder Punkt, wofür er steht. */
 function schrittleiste() {
   $('#schritte').innerHTML = SCHRITTE.map((s, i) => {
     const fertig = s.kat && !!zustand.wahl[s.kat.id];
@@ -108,8 +111,9 @@ function schrittleiste() {
       <button type="button" class="schritt" data-schritt="${i}"
               ${i <= erreichbar() ? '' : 'disabled'}
               aria-current="${aktiv ? 'step' : 'false'}"
+              aria-label="${s.label}"
+              data-titel="${s.label}"
               data-fertig="${fertig}">
-        <span class="schritt__nr">${fertig ? '✓' : i + 1}</span>
         <span class="schritt__label">${s.label}</span>
       </button></li>`;
   }).join('');
@@ -182,10 +186,13 @@ function wahlStufen(k) {
 
   return `
     <div class="karte">
-      <div class="karte__kopf"><div>
-        <span class="hut">${k.name}</span>
-        <h1 class="karte__titel">${k.frage}</h1>
-      </div></div>
+      <div class="karte__kopf">
+        <div>
+          <span class="hut">${k.name}</span>
+          <h1 class="karte__titel">${k.frage}</h1>
+        </div>
+        ${weiterKnopf(i)}
+      </div>
 
       <div class="groessen">
         ${liste.map(l => `
@@ -208,11 +215,16 @@ function wahlStufen(k) {
             <a href="service.html?id=${gew.id}">Ganze Seite zu ${gew.name} →</a></p>
         </div>` : ''}
 
-      <div class="karte__fuss karte__fuss--reihe">
-        <button class="knopf knopf--leer" type="button" data-zurueck="${i - 1}">Zurück</button>
-        <button class="knopf knopf--voll" type="button" data-weiter="${i + 1}">Weiter</button>
-      </div>
     </div>`;
+}
+
+/* Ein Knopf oben rechts führt weiter — zurück geht es über die Punkte. */
+function weiterKnopf(i) {
+  if (i >= LETZTER) return '';
+  return `<button class="weiter" type="button" data-weiter="${i + 1}">
+      ${i + 1 === LETZTER ? 'Zur Anfrage' : 'Weiter'}
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>`;
 }
 
 /* ---------- Fokus (Foto, Video) ---------- */
@@ -231,8 +243,9 @@ function wahlLeute(k) {
           <span class="hut">${k.name} · ${(zustand.blick[k.id] || 0) + 1} von ${liste.length}</span>
           <h1 class="karte__titel">${blick.name}</h1>
           <p class="karte__stil">${blick.stil}</p>
+          <p class="karte__preiszeile">${euro(blick.preis)}<small> / ${blick.einheit}</small></p>
         </div>
-        <div class="preis">${euro(blick.preis)}</div>
+        ${weiterKnopf(i)}
       </div>
 
       <div class="karte__fuss">
@@ -253,10 +266,6 @@ function wahlLeute(k) {
             <a href="service.html?id=${blick.id}">Arbeitsproben ansehen →</a></p>
         </div>` : ''}
 
-      <div class="karte__fuss karte__fuss--reihe">
-        <button class="knopf knopf--leer" type="button" data-zurueck="${i - 1}">Zurück</button>
-        <button class="knopf knopf--voll" type="button" data-weiter="${i + 1}">Weiter</button>
-      </div>
     </div>`;
 }
 
@@ -277,8 +286,7 @@ function wahlAnfrage() {
         <label class="feld"><span>Wie viele Gäste?</span><input id="f-gaeste" type="text" inputmode="numeric" value="${f.gaeste}"></label>
         <label class="feld feld--breit"><span>Was sollen wir wissen?</span><textarea id="f-text" rows="3">${f.text}</textarea></label>
       </div>
-      <div class="karte__fuss karte__fuss--reihe">
-        <button class="knopf knopf--leer" type="button" data-zurueck="${LETZTER - 1}">Zurück</button>
+      <div class="karte__fuss">
         <button class="knopf knopf--voll" type="button" id="senden">Anfrage schicken</button>
       </div>
       <p class="fein" style="margin-top:12px">
@@ -572,8 +580,11 @@ $('#korbTitel').textContent = WELT.anrede;
 
 szene.baueDjs(djListe(), 0);
 
-/* Was in der Bibliothek schon eingesammelt wurde, steht hier bereit. */
+/* Was in der Bibliothek eingesammelt wurde, steht hier bereit —
+   aus dem Speicher, und falls vorhanden zusätzlich aus der Adresse. */
 zustand.wahl = Korb.laden(WELT_ID);
+const ausLink = Korb.ausAdresse(WELT_ID);
+if (ausLink) { zustand.wahl = { ...zustand.wahl, ...ausLink }; merken(); }
 
 if (zustand.wahl.dj) {
   /* Mit DJ im Korb überspringen wir die Auswahl und bauen gleich auf. */

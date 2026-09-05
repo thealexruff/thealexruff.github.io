@@ -42,7 +42,7 @@ body{line-height:1.5}
 
 
 .schritte{
-  display:flex;align-items:center;gap:2px;
+  display:flex;align-items:center;gap:5px;
   list-style:none;margin:0;padding:0;margin-left:auto;
   overflow-x:auto;scrollbar-width:none;
 }
@@ -57,37 +57,61 @@ body{line-height:1.5}
 .kopf__raus:hover{color:var(--ink);border-color:var(--linie-stark)}
 .kopf__raus svg{width:14px;height:14px}
 @media (max-width:520px){ .kopf__raus span{display:none} }
+/* ---------- Schrittleiste: Punkte, der aktuelle als Pille ---------- */
 .schritt{
-  display:inline-flex;align-items:center;gap:6px;
-  background:none;border:0;padding:6px 8px;border-radius:var(--r-knopf);
-  color:var(--leise);cursor:pointer;
-  transition:color .2s ease,background .2s ease;
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  height:16px;width:16px;padding:0;
+  border:0;border-radius:999px;
+  background:color-mix(in srgb,var(--ink) 22%,transparent);
+  color:transparent;cursor:pointer;
+  transition:width .28s var(--weich),padding .28s var(--weich),
+             background .2s ease,color .2s ease;
 }
 .schritt:disabled{opacity:.4;cursor:default}
-.schritt__nr{
-  display:grid;place-items:center;
-  width:22px;height:22px;border-radius:50%;
-  border:1.5px solid currentColor;
-  font-size:11px;font-weight:600;flex:none;
-  transition:width .25s var(--weich),background .2s ease,border-color .2s ease;
-}
-/* Auf schmalen Geräten sind sechs Nummernkreise zu viel — dann Punkte. */
-@media (max-width:620px){
-  .schritt{padding:6px 3px}
-  .schritt__nr{
-    width:9px;height:9px;border-width:0;font-size:0;
-    background:currentColor;opacity:.5;
-  }
-  .schritt[aria-current="step"] .schritt__nr{width:22px;border-radius:5px;opacity:1}
-  .schritt[data-fertig="true"] .schritt__nr{opacity:1}
-}
-.schritt__label{font-size:13px;display:none}
-.schritt[aria-current="step"]{color:var(--ink)}
-.schritt[aria-current="step"] .schritt__label{display:inline}
-.schritt[data-fertig="true"] .schritt__nr{
-  background:var(--akzent);border-color:var(--akzent);color:var(--auf-akzent);
-}
 
+/* Erledigte Schritte sind eingefärbt, kommende bleiben grau */
+.schritt[data-fertig="true"]{background:color-mix(in srgb,var(--akzent) 55%,transparent)}
+
+.schritt__label{
+  font-size:11px;font-weight:700;line-height:1;white-space:nowrap;
+  letter-spacing:.02em;
+  max-width:0;overflow:hidden;opacity:0;
+  transition:max-width .28s var(--weich),opacity .2s ease;
+}
+.schritt[aria-current="step"]{
+  width:auto;padding:0 11px;
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+}
+.schritt[aria-current="step"] .schritt__label{max-width:9em;opacity:1}
+
+/* Beim Zeigen sagt jeder Punkt, wofür er steht */
+.schritt::after{
+  content:attr(data-titel);
+  position:absolute;top:calc(100% + 8px);left:50%;
+  transform:translateX(-50%) translateY(-3px);
+  padding:4px 9px;border-radius:7px;
+  background:var(--ink);color:var(--bg);
+  font-size:11px;font-weight:600;white-space:nowrap;line-height:1.2;
+  opacity:0;pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease;
+}
+@media (hover:hover){
+  .schritt:hover:not([aria-current="step"])::after{opacity:.95;transform:translateX(-50%)}
+}
+.schritt:focus-visible::after{opacity:.95;transform:translateX(-50%)}
+
+.kopf__raus{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  margin-left:8px;padding:7px 12px;border-radius:var(--r-knopf);
+  border:1px solid var(--linie);background:none;
+  font-size:12.5px;font-weight:600;color:var(--leise);text-decoration:none;
+  transition:color .2s ease,border-color .2s ease;
+}
+.kopf__raus:hover{color:var(--ink);border-color:var(--linie-stark)}
+.kopf__raus svg{width:14px;height:14px}
+@media (max-width:520px){ .kopf__raus span{display:none} }
 /* ---------- Bühne / Canvas ---------- */
 .buehne{
   position:fixed;
@@ -260,6 +284,11 @@ body{line-height:1.5}
 }
 .karte__titel{font-family:var(--display);font-size:25px;line-height:1.1}
 .karte__stil{margin:4px 0 0;font-size:14px;color:var(--leise)}
+.karte__preiszeile{
+  margin:6px 0 0;font-family:var(--display);
+  font-size:19px;font-weight:var(--titel-gewicht,600);
+}
+.karte__preiszeile small{font-size:12.5px;font-weight:400;color:var(--leise);font-family:var(--schrift)}
 .preis{font-family:var(--display);font-size:20px;font-weight:700;white-space:nowrap;flex:none;padding-top:16px}
 .karte__text{margin:12px 0 0;font-size:14.5px;color:var(--leise)}
 .karte__text--leise{font-size:13.5px}
@@ -418,7 +447,6 @@ body{line-height:1.5}
    Ab Tablet
    ================================================================== */
 @media (min-width:640px){
-  .schritt__label{display:inline}
   .wahl{padding:18px 24px 24px}
   .karte{padding:22px}
   .karte__titel{font-size:30px}
@@ -504,3 +532,28 @@ body[data-welt="wedding"] .punkt[aria-current="true"]{background:var(--akzent)}
 body[data-welt="wedding"] .blatt{
   box-shadow:0 -1px 0 var(--linie), 0 -18px 40px rgba(43,36,32,.07);
 }
+
+/* ------------------------------------------------------------------
+   Weiter sitzt jetzt neben der Überschrift. Zurück übernehmen
+   die Punkte in der Kopfzeile.
+   ------------------------------------------------------------------ */
+.weiter{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  align-self:flex-start;margin-top:2px;
+  padding:9px 15px;border-radius:var(--knopf-radius);
+  border:1px solid transparent;
+  background:linear-gradient(100deg,var(--akzent),var(--akzent-2));
+  color:var(--auf-akzent);
+  font-size:13.5px;font-weight:600;line-height:1;white-space:nowrap;
+  cursor:pointer;
+  box-shadow:0 8px 22px -10px var(--glut);
+  transition:transform .16s var(--weich),filter .2s ease;
+}
+body[data-welt="wedding"] .weiter{
+  background:var(--akzent);box-shadow:none;
+  font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding:11px 16px;
+}
+body[data-welt="corporate"] .weiter{box-shadow:0 2px 8px -3px var(--glut)}
+.weiter svg{width:15px;height:15px}
+.weiter:active{transform:scale(.97)}
+@media (hover:hover){ .weiter:hover{filter:brightness(1.07)} }

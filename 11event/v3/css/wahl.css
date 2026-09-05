@@ -85,3 +85,51 @@
   .wahlpunkte{display:none}
   .wahlseite__mitte{padding:40px 0}
 }
+
+/* ==================================================================
+   Nachfrage beim Wechsel des Anlasses
+   ================================================================== */
+.frage{
+  position:fixed;inset:0;z-index:100;
+  display:grid;place-items:end center;
+  background:rgba(6,6,9,.72);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s;
+  padding:0;
+}
+.frage[data-offen="true"]{opacity:1;visibility:visible}
+.frage__blatt{
+  width:100%;max-width:460px;
+  background:var(--grund);
+  border:1px solid var(--linie);border-bottom:0;
+  border-radius:22px 22px 0 0;
+  padding:26px 22px calc(26px + var(--sicher));
+  transform:translateY(18px);transition:transform .3s var(--weich);
+}
+.frage[data-offen="true"] .frage__blatt{transform:none}
+.frage h2{font-size:22px}
+.frage p{margin-top:10px;color:var(--leise);font-size:14.5px}
+.frage__liste{
+  list-style:none;margin:16px 0 0;padding:0;
+  display:flex;flex-direction:column;gap:7px;
+}
+.frage__liste li{
+  display:flex;align-items:center;gap:9px;font-size:14px;
+}
+.frage__liste li::before{
+  content:'';flex:none;width:6px;height:6px;border-radius:50%;background:var(--akzent);
+}
+.frage__liste .faellt-weg{color:var(--schwach);text-decoration:line-through}
+.frage__liste .faellt-weg::before{background:var(--schwach)}
+.frage__liste .faellt-weg small{text-decoration:none;font-size:11.5px}
+.frage__knoepfe{display:flex;gap:10px;margin-top:22px}
+.frage__knoepfe .knopf{flex:1}
+.frage__ab{
+  display:block;width:100%;margin-top:14px;
+  background:none;border:0;cursor:pointer;
+  font-size:13px;color:var(--schwach);text-decoration:underline;text-underline-offset:3px;
+}
+@media (min-width:640px){
+  .frage{place-items:center}
+  .frage__blatt{border:1px solid var(--linie);border-radius:20px;padding:30px 28px}
+}

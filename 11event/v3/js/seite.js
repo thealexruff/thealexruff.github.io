@@ -442,6 +442,11 @@ function korbLeiste() {
   if (!p.length) return;
   $('#korbBarText').textContent =
     `${p.length} ${p.length === 1 ? 'Position' : 'Positionen'} · ${euro(Korb.summe(WELT_ID))}`;
+
+  /* Die Auswahl hängt zusätzlich am Link. Das macht ihn verschickbar
+     und rettet die Übergabe, falls der Browser eine alte Seite hält. */
+  const code = Korb.codieren(Korb.laden(WELT_ID));
+  $('#korbBarLink').href = 'konfigurator.html' + (code ? `?korb=${code}` : '');
 }
 
 function verhalten() {

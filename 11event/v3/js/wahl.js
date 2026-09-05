@@ -57,4 +57,63 @@
   document.querySelectorAll('[data-jahr]').forEach(e => {
     e.textContent = new Date().getFullYear();
   });
+
+  /* ----------------------------------------------------------------
+     Anlass wechseln: liegt in einer anderen Welt schon etwas im Korb,
+     fragen wir, statt heimlich zu löschen oder heimlich zu übernehmen.
+     ---------------------------------------------------------------- */
+  const dialog = document.getElementById('uebernahme');
+
+  bahn.addEventListener('click', (e) => {
+    const karte = e.target.closest('.welt');
+    if (!karte || !dialog) return;
+    const ziel = karte.dataset.fuer;
+
+    /* Hat das Ziel schon etwas, wird nichts angefasst. */
+    if (Object.keys(Korb.laden(ziel)).length) return;
+
+    const quellen = Korb.volleWelten(ziel);
+    if (!quellen.length) return;
+
+    /* Zuletzt benutzte Welt bevorzugen */
+    const von = quellen.includes(Korb.letzteWelt()) ? Korb.letzteWelt() : quellen[0];
+    const { neu, weg } = Korb.passend(von, ziel);
+    const anzahl = Object.keys(neu).length;
+
+    e.preventDefault();
+    dialog.dataset.von  = von;
+    dialog.dataset.nach = ziel;
+    dialog.dataset.url  = karte.getAttribute('href');
+
+    document.getElementById('uebernahmeText').innerHTML =
+      `Ihr habt schon eine Auswahl für <b>${WELTEN[von].name}</b>. `
+      + (anzahl
+          ? `Davon ${anzahl === 1 ? 'passt einer' : `passen ${anzahl}`} auch zu ${WELTEN[ziel].name}.`
+          : `Davon passt nichts zu ${WELTEN[ziel].name}.`);
+
+    document.getElementById('uebernahmeListe').innerHTML =
+      Object.values(neu).map(id => `<li>${leistung(id).name}</li>`).join('')
+      + weg.map(l => `<li class="faellt-weg">${l.name} <small>gibt es dort nicht</small></li>`).join('');
+
+    document.getElementById('uebernahmeJa').hidden = anzahl === 0;
+    dialog.dataset.offen = 'true';
+  });
+
+  if (dialog) {
+    dialog.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-tun]');
+      if (!b && e.target !== dialog) return;
+      const tun = b ? b.dataset.tun : 'ab';
+
+      if (tun === 'uebernehmen') {
+        Korb.uebernehmen(dialog.dataset.von, dialog.dataset.nach);
+        location.href = dialog.dataset.url;
+      } else if (tun === 'neu') {
+        Korb.speichern(dialog.dataset.nach, {});
+        location.href = dialog.dataset.url;
+      } else {
+        dialog.dataset.offen = 'false';
+      }
+    });
+  }
 })();

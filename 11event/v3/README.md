@@ -103,6 +103,26 @@ Beim Laden wirft `Korb.laden()` alles weg, was es nicht mehr gibt oder was
 in dieser Welt nicht gilt; sonst hinge nach einer Katalogänderung eine
 Leiche im Korb.
 
+Zusätzlich hängt die Auswahl am Link der Korbleiste (`?korb=id,id,…`).
+Das macht sie verschickbar — und rettet die Übergabe, falls der Browser
+noch eine alte Seite im Speicher hält.
+
+**Anlass wechseln:** Auf der Eingangsseite fragt ein Dialog, ob die
+Auswahl mitkommen soll. `Korb.passend(von, nach)` trennt dabei, was in
+der Zielwelt gilt, von dem, was es dort nicht gibt (LED-Wand, Blüten,
+welt-eigene DJs) — Letzteres wird durchgestrichen angezeigt und fällt
+weg. Der alte Korb bleibt unangetastet, man kann also zurück.
+
+## Schrittleiste
+
+Alle Schritte sind Punkte auf gleicher Höhe; nur der aktuelle wird zur
+Pille **mit der Beschriftung darin**. Erledigte Punkte sind eingefärbt,
+kommende grau. Beim Zeigen (oder per Tastaturfokus) sagt jeder Punkt über
+`data-titel`, wofür er steht. Dasselbe auf Handy und Desktop.
+
+**Zurück gibt es nicht mehr als Knopf** — dafür sind die Punkte da.
+Weiter sitzt oben rechts neben der Überschrift.
+
 ## Bibliothek
 
 Oben ein **Gruppenwähler**, darunter immer nur eine Kategorie. Ein Klick auf
